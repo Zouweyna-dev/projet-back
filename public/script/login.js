@@ -33,7 +33,7 @@ if (myForm && notificationMessage) {
 
                 if (token) {
                     window.localStorage.setItem('token', token);
-                    window.location.href = '/api/game';
+                    window.location.href = '/loading';
 
                 } else {
                     console.log('Error: No valid response received from the server');

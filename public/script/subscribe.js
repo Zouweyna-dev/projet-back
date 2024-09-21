@@ -22,7 +22,7 @@ if (myForm) {
             console.log("body", JSON.stringify(data))
 
             setTimeout(() => {
-                window.location.href = "/login";
+                window.location.href = "/api/login";
             }, 2000);
 
         } catch (err) {

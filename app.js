@@ -14,15 +14,21 @@ import { apiStatus } from "./api-status.js";
 import crypto from 'crypto';
 
 
+
+
 const dbName = "Game";
 const connectionString = "mongodb://127.0.0.1:27017";
 const client = new MongoClient(connectionString);
 import cookieParser from 'cookie-parser';
+import * as http from "http";
 
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIO(server);
+
+// app.use(cors({
+//     origin: 'http://192.168.1.98'
+// }));
+
 const jwtSecret = crypto.randomBytes(64).toString('hex');
 console.log(jwtSecret);
 app.set('view engine', 'pug');
@@ -130,14 +136,15 @@ console.log('tryyyy subscribe')
  * - Création d’un jeton JWT si on a reçu un nom d’utilisateur et un mot de
  * passe valides.
  */
-app.get('/api/login',(req, res) => {
+app.route('/api/login')
+    .get((req, res) => {
 
         //res.render('login', { player1Name, player2Name });
         res.render('login');
 
-    });
+    })
 
-app.post( '/api/login',async (request, response, next) => {
+.post( async (request, response, next) => {
     const { userName,password} = request.body;
     console.log('post login ',request.body)
     console.log('username',userName)
@@ -204,7 +211,7 @@ app.post( '/api/login',async (request, response, next) => {
     }
 });
 
-app.get('/api/game',(req,res)=>{
+    app.get('/api/game',(req,res)=>{
 
     // const player1Name = req.token.decodedToken.player1Name;
     // const player2Name = req.token.decodedToken.player2Name;
@@ -310,36 +317,73 @@ app.get("/api/check-token", (request, response) => {
         token: request.token,
     });
 });
+app.get("/loading",(req,res)=>{
+
+    return res.render("loading")
+});
+
 
 const httpServer = app.listen(80, () => {
     console.log('HTTP Server started on port 80');
-})
+});
+
 
 /** Partie Socket.io back-end */
 
 
-const ioServer = new Server(httpServer);
+const ioServer = new Server(httpServer, {
+    cors: {
+        origin: "http://localhost",
+        methods: ["GET", "POST"]
+    }
+});
+let connectedUsers = []; // Liste des noms d'utilisateur
+
 ioServer.on('connection', (socket) => {
-    console.log('A user connected');
+    console.log('Un client est connecté');
 
-    // Écoute de l'événement pour recevoir le nom du joueur
-    socket.on('registerName', (token) => {
-        // Vérifie et extrait le nom d'utilisateur depuis le token
-        const userName = req.token.userName; // Assure-toi que 'req.token' est accessible ici
+    const token = socket.handshake.query.token;
+    let decodedToken;
 
-        socket.username = userName; // Stocke le nom du joueur dans l'objet socket
+    try {
+        decodedToken = jwt.verify(token, jwtSecret);
+        console.log('Token décodé:', decodedToken);
+    } catch (error) {
+        console.error('Erreur de décodage du token:', error);
+        return;
+    }
 
-        // Émet un événement à tous les autres joueurs
-        socket.broadcast.emit('userConnected', { name: socket.username });
-
-        // Optionnel : Envoie un message de bienvenue au joueur
+    if (decodedToken && decodedToken.userName) {
+        socket.username = decodedToken.userName;
+        connectedUsers.push(socket.username); // Ajoutez le nom à la liste
         socket.emit('welcome', { message: 'Welcome to the game!' });
+    }
+
+    socket.on('ready', () => {
+        console.log('Signal de préparation reçu de', socket.username);
+        socket.emit('connected', { name: socket.username });
+
+        // Émettez la liste mise à jour des utilisateurs à tous les clients
+        ioServer.emit('usersUpdated', connectedUsers);
     });
 
     socket.on('disconnect', () => {
         console.log('A user disconnected');
+        const index = connectedUsers.indexOf(socket.username);
+        if (index !== -1) {
+            connectedUsers.splice(index, 1); // Retirez le nom de la liste
+
+            ioServer.emit('usersUpdated', connectedUsers);
+        }
     });
 });
+
+//git remote -v
+//git remote add origin http:// github.com/tonnom/repository.git
+//git push -u origin master
+// # ou 'main' si ton branche principale s'appelle 'main'
+//git remote -v
+//git remote remove origin
 
 
 // Pour aller plus loin sur la problématique de la latence sur
