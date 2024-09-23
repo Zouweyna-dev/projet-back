@@ -79,8 +79,11 @@ const recipes = [
 
 let currentRecipe;
 let correctIngredients;
-let timer;
+
 let scores = [0, 0];
+let timeLeft = 30;
+let timerInterval;
+let timerStarted = false;
 
 function initGame() {
     currentRecipe = recipes[Math.floor(Math.random() * recipes.length)];
@@ -88,26 +91,43 @@ function initGame() {
     correctIngredients = currentRecipe.ingredients;
     shuffleArray(ingredients);
 
-    const player1Grid = document.getElementById('player1-grid');
-    const player2Grid = document.getElementById('player2-grid');
-    player1Grid.innerHTML = '';
-    player2Grid.innerHTML = '';
+    // const player1Grid = document.getElementById('player1-grid');
+    // const player2Grid = document.getElementById('player2-grid');
+    const playerGrid = document.getElementById('player-grid');
+    playerGrid.innerHTML = '';
+  //  player2Grid.innerHTML = '';
 
     ingredients.forEach(ingredient => {
         const button1 = createIngredientButton(ingredient, 1);
-        const button2 = createIngredientButton(ingredient, 2);
-        player1Grid.appendChild(button1);
-        player2Grid.appendChild(button2);
+        //const button2 = createIngredientButton(ingredient, 2);
+        playerGrid.appendChild(button1);
+       // player2Grid.appendChild(button2);
     });
 
+    resetTimer();
+    enableStartTimerButton();
     scores = [0, 0];
     updateScores();
-    startTimer();
+
+}
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerStarted = false;
+    timeLeft = 30;
+    updateTimerDisplay();
+}
+function enableStartTimerButton() {
+    const startTimerButton = document.getElementById('startTimerButton');
+    startTimerButton.disabled = false;
+    startTimerButton.textContent = 'Lancer le chronomètre';
 }
 
 function createIngredientButton(ingredient, playerNumber) {
     const button = document.createElement('button');
     button.className = 'ingredient';
+
+
+
     button.onclick = () => selectIngredient(ingredient, playerNumber, button);
     button.textContent = ingredient;
     return button;
@@ -140,20 +160,29 @@ function checkWinCondition() {
     }
 }
 
+
 function startTimer() {
-    let timeLeft = 90;
-    const timerElement = document.getElementById('time');
-    timer = setInterval(() => {
+    if (timerStarted) return;
+
+    timerStarted = true;
+    document.getElementById('startTimerButton').disabled = true;
+    document.querySelectorAll('.ingredient').forEach(button => button.disabled = false);
+
+     timerInterval = setInterval(() => {
         timeLeft--;
-        timerElement.textContent = timeLeft;
+        updateTimerDisplay();
         if (timeLeft <= 0) {
+            clearInterval(timerInterval);
             endGame();
         }
     }, 1000);
 }
+function updateTimerDisplay() {
+    document.getElementById('timer').textContent = `Temps restant: ${timeLeft}s`;
+}
 
 function endGame() {
-    clearInterval(timer);
+
     let message;
     if (scores[0] > scores[1]) {
         message = `Le Pâtissier 1 gagne avec un score de ${scores[0]} !`;

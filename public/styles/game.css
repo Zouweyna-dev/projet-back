@@ -23,7 +23,7 @@
     text-align: center;
     max-width: 1000px;
     width: 95%;
-    margin: 2rem auto;
+    margin: 3rem auto;
 }
 h1 {
     font-size: 2.5rem;
@@ -32,30 +32,42 @@ h1 {
 
 .game-area {
     display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
 }
 
 .player-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem;
     flex: 1;
-    margin: 0 1rem;
+
 }
+
 
 .ingredient-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 0.6rem;
 }
 
 .ingredient {
+    font-weight: bold;
+    font-family: 'Comic Neue', cursive;
     background-color: #f0e6d2;
     border: none;
     border-radius: 8px;
-    padding: 1rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin: 0.5rem;
+    width: 60%;
+    padding:0.7rem;
+
 }
 
 .ingredient:hover {
@@ -71,16 +83,17 @@ h1 {
     font-size: 1.5rem;
     font-weight: bold;
     color: #8b4513;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
 }
 
 .recipe {
     font-size: 1.2rem;
     color: #5e2f0d;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
     padding: 1rem;
     background-color: #fdf6e3;
     border-radius: 8px;
+
 }
 
 .status {
@@ -95,10 +108,11 @@ h2 {
 }
 
 .score {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     color: #4caf50;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
+
 }
 
 ul#playerList {
@@ -127,4 +141,45 @@ ul#playerList li:hover {
     background-color: #f0f0f0;
 }
 
+
+.ingredient-button {
+    /* Réduire la taille du bouton */
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+}
+.button {
+    background-color: #5c9ead;
+    color: white;
+    border: none;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0.5rem;
+}
+
+.button:hover {
+    background-color: #4a7c8a;
+}
+
+.feedback {
+    font-size: 1.1rem;
+    color: #333;
+    margin-top: 1rem;
+}
+
+/*.timer {*/
+/*    font-size: 1.5rem;*/
+/*    color: #5c9ead;*/
+/*    margin-bottom: 1rem;*/
+/*}*/
+
+#startTimerButton {
+    background-color: #ff6b6b;
+}
+
+#startTimerButton:hover {
+    background-color: #ff4757;
+}
 

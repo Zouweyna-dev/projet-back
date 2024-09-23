@@ -9,19 +9,21 @@ block content
         h1 D&eacute;fi P&acirc;tisserie : La Course aux Desserts
         .timer
             | Temps restant:
-            span#time 90
-            | s
+            span#timer 30
+
         #recipe.recipe Recette: En attente de la s&eacute;lection du chef...
         .game-area
             .player-area
                 h2#player1Name
                 #player1-score.score Score: 0
-                #player1-grid.ingredient-grid
                 #player1-status.status En attente...
             .player-area
                 h2#player2Name
                 #player2-score.score Score: 0
-                #player2-grid.ingredient-grid
                 #player2-status.status En attente...
+        #player-grid.ingredient-grid
+
+
+        button#startTimerButton.button(onclick='startTimer()') Lancer le chronom&egrave;tre
         ul#playerList
     script(src='/script/game.js')
