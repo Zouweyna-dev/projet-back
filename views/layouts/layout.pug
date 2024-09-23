@@ -1,0 +1,17 @@
+doctype html
+html(lang="fr")
+    head
+        include ../includes/head
+        //link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+        //link(rel="stylesheet" href="/styles/footer.css")
+
+    body(class="d-flex flex-column min-vh-100")
+        if !noHeader
+            include ../includes/header
+
+        block content
+
+        include ../includes/footer
+
+
+

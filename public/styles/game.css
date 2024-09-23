@@ -1,30 +1,31 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap');
 
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f9f1e7;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
+/*body {*/
+/*    font-family: 'Roboto', sans-serif;*/
+/*    background-color: #f9f1e7;*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    min-height: 100vh;*/
+/*}*/
 
 .game-container {
-    background-color: #fff;
+    /*font-family: 'Bangers', cursive;*/
+    font-family: 'Comic Neue', cursive;
+    color: var(--primary-color);
+    background-color: #ffcccb;
     border-radius: 15px;
     padding: 2rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
     max-width: 1000px;
     width: 95%;
+    margin: 2rem auto;
 }
-
 h1 {
-    font-family: 'Playfair Display', serif;
-    color: #8b4513;
     font-size: 2.5rem;
     margin-bottom: 1rem;
 }
@@ -99,32 +100,31 @@ h2 {
     color: #4caf50;
     margin-top: 0.5rem;
 }
-/* Styles pour la liste des utilisateurs */
+
 ul#playerList {
-    list-style-type: none; /* Retire les puces */
+    list-style-type: none;
     padding: 0;
-    margin: 20px 0; /* Ajoute un espace autour de la liste */
-    background-color: #ffffff; /* Fond blanc pour correspondre au conteneur */
-    border-radius: 10px; /* Coins arrondis */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre légère */
-    max-height: 300px; /* Limite la hauteur de la liste */
-    overflow-y: auto; /* Permet le défilement si la liste est longue */
+    margin: 20px 0;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 ul#playerList li {
-    padding: 10px; /* Espacement interne */
-    font-size: 1.1rem; /* Taille de police */
-    color: #333; /* Couleur du texte */
-    border-bottom: 1px solid #eee; /* Ligne de séparation */
+    padding: 10px;
+    font-size: 1.1rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
 }
-
 ul#playerList li:last-child {
-    border-bottom: none; /* Supprime la bordure pour le dernier élément */
+    border-bottom: none;
 }
 
 /* Optionnel : style pour le survol des éléments de la liste */
 ul#playerList li:hover {
-    background-color: #f0f0f0; /* Fond légèrement différent au survol */
+    background-color: #f0f0f0;
 }
 
 

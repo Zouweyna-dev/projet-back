@@ -1,17 +1,18 @@
-head
-    meta(charset='UTF-8')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    title La Folie des Desserts - Accueil
-    link(rel='stylesheet', href='styles/style.css')
+extends layouts/layout
 
-.container
-    .dessert-icon &#x1F370;
-    h1 La Folie des Desserts
-    p.intro
-        | Pr&eacute;parez-vous &agrave; un festin sucr&eacute; et amusant ! Connectez-vous ou inscrivez-vous pour commencer &agrave; jouer.
+block content
+    head
+        title La Folie des Desserts - Inscription
+        link(rel='stylesheet', href='styles/style.css')
+
+    .container
+        .dessert-icon &#x1F370;
+        h1 La Folie des Desserts
+        p.intro
+            | Pr&eacute;parez-vous &agrave; un festin sucr&eacute; et amusant ! Connectez-vous ou inscrivez-vous pour commencer &agrave; jouer.
 
         h2 Inscription
-        form#subscribe(action='/subscribe' method='POST')
+        form#subscribe(action='/subscribe', method='POST')
             .form-group
                 label(for='username') Nom d&apos;utilisateur :
                 input#username(type='text', name='userName', required='')
@@ -22,6 +23,7 @@ head
                 label(for='register-password') Mot de passe :
                 input#register-password(type='password', name='password', required='')
             button(type='submit') S&apos;inscrire
+
         p.toggle-form
             | D&eacute;j&agrave; inscrit ?
             a(href='/api/login', class='no-effect') Connectez-vous ici !
@@ -29,4 +31,4 @@ head
     div#notification
         p#notificationMessage
 
-script(src='script/subscribe.js')
+    script(src='script/subscribe.js')

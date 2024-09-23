@@ -56,6 +56,9 @@ app.locals.pretty = true;
 app.get("/api-test", (request, response) => {
     response.json(apiStatus);
 });
+app.get("/index", (request, response) => {
+    return response.render("index");
+});
 
 /**
  * Création de compte utilisateur
@@ -365,6 +368,14 @@ ioServer.on('connection', (socket) => {
 
         // Émettez la liste mise à jour des utilisateurs à tous les clients
         ioServer.emit('usersUpdated', connectedUsers);
+
+
+        if (connectedUsers.length >= 2) {
+            const player1Name = connectedUsers[0];
+            const player2Name = connectedUsers[1];
+            ioServer.emit('playerNames', { player1: player1Name, player2: player2Name });
+        }
+
     });
 
     socket.on('disconnect', () => {

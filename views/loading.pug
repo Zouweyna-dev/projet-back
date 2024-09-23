@@ -1,15 +1,16 @@
-doctype html
-html
-    head
-        title Chargement...
-        link(rel='stylesheet', href='/styles/style.css')
-        script(src='https://cdn.socket.io/4.0.0/socket.io.min.js')
-        script(src='/script/loading.js')
+extends layouts/layout
+
+block content
+    title Chargement...
+    link(rel='stylesheet', href='/styles/style.css')
+    script(src='https://cdn.socket.io/4.0.0/socket.io.min.js')
+    script(src='/script/loading.js')
+
     body
         .container
             h1 Chargement en cours...
             ul#playerList
-            button#startButton(type="button") Commencer la parti
+            button#startButton(type="button") Commencer la partie
 
             .loader
                 div.loader-item

@@ -1,17 +1,19 @@
-head
-    meta(charset='UTF-8')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    title La Folie des Desserts - Accueil
+extends layouts/layout
+
+block content
+    title La Folie des Desserts - Login
     link(rel='stylesheet', href='/styles/style.css')
+    script(src='https://cdn.socket.io/4.0.0/socket.io.min.js')
+    //script(src="./socket.io/socket.io.min.js")
 
-.container
-    .dessert-icon &#x1F370;
-    h1 La Folie des Desserts
-    p.intro
-        | Pr&eacute;parez-vous &agrave; un festin sucr&eacute; et amusant ! Connectez-vous ou inscrivez-vous pour commencer &agrave; jouer.
+    .container
+        .dessert-icon &#x1F370;
+        p.intro
+            | Pr&eacute;parez-vous &agrave; un festin sucr&eacute; et amusant ! Connectez-vous ou inscrivez-vous pour commencer &agrave; jouer.
 
-    form#login-form
-        h2 Connexion
+        form#login-form
+
+            h2 Connexion
             .form-group
                 label(for='login-username') Nom d&apos;utilisateur :
                 input#login-username(type='text', name='userName', required='')
@@ -19,8 +21,11 @@ head
                 label(for='login-password') Mot de passe :
                 input#login-password(type='password', name='password', required='')
             button(type='submit') Se connecter
+
         p.toggle-form
             | Pas encore inscrit ?
             a(href='/subscribe', class='no-effect') Inscrivez-vous ici !
+
         p#notificationMessage
-script(src='/script/login.js')
+
+    script(src='/script/login.js')

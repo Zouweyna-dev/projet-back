@@ -1,6 +1,30 @@
-doctype html
-head
-  title Des petits carrés
-script(src="./socket.io/socket.io.min.js")
-script(src="./assets/js/front.js")
+extends layouts/layout
 
+block content
+    link(rel='stylesheet', href='/styles/index.css')
+    script(src='https://cdn.socket.io/4.0.0/socket.io.min.js')
+    title La Folie des Desserts - Accueil
+
+    main#main-content.main-content
+        section.hero
+            h1 La Folie des Desserts
+            p.subtitle
+                | Explorez votre cr&eacute;ativit&eacute; culinaire dans un jeu de cr&eacute;ation de desserts d&eacute;lirant !
+            a.cta-button(href='/game') Commencer l&apos;aventure sucr&eacute;e !
+
+        section.features
+            .feature
+                .feature-icon &#x1F3A8;
+                h3.feature-title Cr&eacute;ativit&eacute; Folle
+                p.feature-description Combinez des ingr&eacute;dients loufoques pour cr&eacute;er des desserts uniques et d&eacute;lirants.
+            .feature
+                .feature-icon &#x1F3C6;
+                h3.feature-title D&eacute;fis Givr&eacute;s
+                p.feature-description
+                    | Relevez des d&eacute;fis p&acirc;tissiers compl&egrave;tement fous et gagnez des r&eacute;compenses d&eacute;lirantes.
+            .feature
+                .feature-icon &#x1F468;&zwj;&#x1F373;
+                h3.feature-title Super Pouvoirs
+                p.feature-description Devenez un super-h&eacute;ros de la p&acirc;tisserie avec des comp&eacute;tences extraordinaires !
+
+    script(src="/script/index.js")

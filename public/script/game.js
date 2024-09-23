@@ -20,9 +20,18 @@ socket.on('connect', () => {
         console.log('Nouvel utilisateur connecté:', data.name);
     });
 
+    socket.on('playerNames', (names) => {
+        const player1Name = names.player1;
+        const player2Name = names.player2;
+
+        document.querySelector('h2#player1Name').textContent = player1Name;
+        document.querySelector('h2#player2Name').textContent = player2Name;
+    });
+
+
     socket.on('usersUpdated', (users) => {
         const userList = document.getElementById('playerList');
-        userList.innerHTML = ""; // Nettoyez la liste actuelle
+        userList.innerHTML = "";
 
         users.forEach(user => {
             const newUser = document.createElement('li');
@@ -32,7 +41,7 @@ socket.on('connect', () => {
     });
 });
 
-// Gestion des erreurs de connexion
+
 socket.on('connect_error', (err) => {
     console.error('Erreur de connexion:', err);
 });

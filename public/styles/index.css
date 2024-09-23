@@ -1,0 +1,144 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@300;400;700&display=swap');
+
+:root {
+    --primary-color: #4A4E69;
+    --secondary-color: #9A8C98;
+    --tertiary-color: #C9ADA7;
+    --accent-color: #F2E9E4;
+    --text-color: #22223B;
+    --background-color: #FFFFFF;
+}
+
+body {
+    font-family: 'Comic Neue', cursive;
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    color: var(--text-color);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+}
+
+.hero {
+    text-align: center;
+    max-width: 800px;
+    margin-bottom: 3rem;
+}
+
+h1 {
+    font-family: 'Bangers', cursive;
+    color: var(--primary-color);
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    text-shadow: 3px 3px 0px var(--tertiary-color);
+    letter-spacing: 3px;
+}
+
+.subtitle {
+    font-size: 1.3rem;
+    color: var(--secondary-color);
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+
+.cta-button {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.3rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-family: 'Comic Neue', cursive;
+}
+
+.cta-button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.feature {
+    background-color: var(--accent-color);
+    padding: 1.5rem;
+    border-radius: 15px;
+    width: 250px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px) rotate(2deg);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.feature-title {
+    font-family: 'Bangers', cursive;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+}
+
+.feature-description {
+    font-size: 1rem;
+    color: var(--text-color);
+    font-weight: 400;
+}
+
+footer {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    font-family: 'Comic Neue', cursive;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .features {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .feature {
+        width: 80%;
+    }
+
+    h1 {
+        font-size: 4rem;
+    }
+}

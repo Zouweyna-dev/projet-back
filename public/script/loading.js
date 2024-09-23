@@ -4,13 +4,10 @@ const socket = io.connect('http://192.168.1.98', {
     query: { token: token }
 });
 
-socket.on('connect', () => {
-    console.log('Connecté au serveur.');
-    socket.emit('ready'); // Assurez-vous que cela est appelé
 
     socket.on('connect', () => {
         console.log('Connecté au serveur.');
-        socket.emit('ready'); // Émettez le signal de préparation
+        socket.emit('ready');
 
         socket.on('connected', (data) => {
             console.log('Événement userConnected reçu:', data.name);
@@ -42,4 +39,4 @@ socket.on('connect', () => {
 socket.on('connect_error', (err) => {
     console.error('Erreur de connexion:', err);
 });
-});
+

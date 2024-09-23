@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+
+.navbar {
+    background-color: var(--background-color);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo {
+    font-family: 'Bangers', cursive;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.nav-link:hover {
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
