@@ -1,5 +1,6 @@
 const myForm = document.getElementById('login-form');
 const notificationMessage = document.getElementById('notificationMessage');
+console.log("tesssst");
 
 if (myForm && notificationMessage) {
     myForm.addEventListener('submit', async (event) => {
@@ -8,10 +9,10 @@ if (myForm && notificationMessage) {
         const data = Object.fromEntries(formData);
 
         try {
-            const result = await fetch('http://localhost/api/login', {
+            const result = await fetch('http://localhost/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(data),
             });
@@ -21,21 +22,21 @@ if (myForm && notificationMessage) {
                 const text = await result.text();
                 console.log('Réponse du serveur en texte brut :', text);
             } else {
-
                 const responseBody = await result.json();
-                console.log("Server Response:", responseBody);
                 const token = responseBody.token;
                 const { userName, email } = responseBody;
                 console.log('UserName:', userName);
                 console.log('Email:', email);
                 console.log('Token:', token);
 
-
                 if (token) {
+                    // Stocker le token dans localStorage
                     window.localStorage.setItem('token', token);
-                    window.location.href = '/loading';
-
-                } else {
+                    window.localStorage.setItem('userName', userName);
+                        // Redirection vers la page de jeu si tout est correct
+                        window.location.href = '/game'; // Redirection vers la page de jeu
+                    }
+                else {
                     console.log('Error: No valid response received from the server');
                 }
             }

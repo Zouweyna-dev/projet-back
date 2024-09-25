@@ -1,42 +1,56 @@
-const token = window.localStorage.getItem('token');
-console.log('token:', token);
-const socket = io.connect('http://192.168.1.98', {
-    query: { token: token }
+
+import { connectSocket } from './socketUtils.js';
+
+window.onload = function(){
+    const token = window.localStorage.getItem('token');
+    console.log('token:', token);
+
+    const onRoomCreated = (data) => {
+        console.log('Room created:', data.roomID);
+        console.log('Player 1:', data.player1);
+        updatePlayerList(data.player1);
+
+    };
+
+    if (!window.socket) {
+        window.socket = connectSocket(token, onRoomCreated, updatePlayerList);
+    }
+
+
+let gameStarted = false;
+    console.log("je suis dans loading")
+    window.socket.on('roomReady', function (data) {
+    console.log('Room', data.roomID, 'is ready');
+
+    updatePlayerList([data.player1,data.player2]);
+
+    gameStarted = true;
 });
 
 
-    socket.on('connect', () => {
-        console.log('Connecté au serveur.');
-        socket.emit('ready');
+    const startButton = document.getElementById('startButton');
 
-        socket.on('connected', (data) => {
-            console.log('Événement userConnected reçu:', data.name);
-            const playerList = document.getElementById('playerList');
-            const newPlayer = document.createElement('li');
-            newPlayer.textContent = `${data.name} est connecté`;
-            playerList.appendChild(newPlayer);
-            console.log('Nouvel utilisateur connecté:', data.name);
-        });
-    });
-
-    socket.on('usersUpdated', (users) => {
-        const userList = document.getElementById('playerList'); // Assurez-vous que c'est le bon élément
-        userList.innerHTML = ""; // Nettoyez la liste actuelle
-
-        users.forEach(user => {
-            const newUser = document.createElement('li');
-            newUser.textContent = `${user} est connecté`; // Mettez à jour la manière dont vous affichez le nom
-            userList.appendChild(newUser);
-        });
-        document.getElementById('startButton').addEventListener('click', function() {
-            socket.emit('startGame');
+    if (startButton) {
+        startButton.addEventListener('click', () => {
             window.location.href = '/api/game';
+            console.log('La partie commence !');
+            // socket.emit('startGame');
         });
+    } else {
+        console.error('L\'élément startButton n\'existe pas.');
+    }
+
+}
+
+export function updatePlayerList(users) {
+    const playerList = document.getElementById('playerList');
+    if (!Array.isArray(users)) {
+        users = [users];
+    }
+    playerList.innerHTML = "";
+    users.forEach(user => {
+        const newPlayer = document.createElement('li');
+        newPlayer.textContent = `${user} est connecté`;
+        playerList.appendChild(newPlayer);
     });
-
-
-// Gestion des erreurs de connexion
-socket.on('connect_error', (err) => {
-    console.error('Erreur de connexion:', err);
-});
-
+}

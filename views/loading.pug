@@ -4,15 +4,22 @@ block content
     title Chargement...
     link(rel='stylesheet', href='/styles/style.css')
     script(src='https://cdn.socket.io/4.0.0/socket.io.min.js')
-    script(src='/script/loading.js')
+
 
     body
         .container
             h1 Chargement en cours...
+            div#playerContainer
             ul#playerList
+
             button#startButton(type="button") Commencer la partie
 
             .loader
                 div.loader-item
                 div.loader-item
                 div.loader-item
+
+
+
+
+    script(type='module', src='/script/loading.js')

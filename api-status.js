@@ -1,5 +1,5 @@
 export const apiStatus = {
-  name: "API REST Restaurants de New York",
+  name: "API REST ",
   version: "1.0.0",
   status: "OK",
 };

@@ -1,4 +1,8 @@
 # Projet de Jeu Multijoueur
+- start-game : Crée une nouvelle session de jeu. 
+- active-games : Récupère toutes les sessions de jeu actives.
+- join-game gameSessionId : Permet à un joueur de rejoindre une session de jeu existante.
+- game gameSessionId : Récupère et affiche les détails d'une session de jeu
 
 ## Technologies utilisées
 - JavaScript

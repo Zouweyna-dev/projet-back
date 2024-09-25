@@ -15,15 +15,16 @@ block content
         .game-area
             .player-area
                 h2#player1Name
-                #player1-score.score Score: 0
+                #player1score.score Score: 0
                 #player1-status.status En attente...
             .player-area
                 h2#player2Name
-                #player2-score.score Score: 0
+                #player2score.score Score: 0
                 #player2-status.status En attente...
         #player-grid.ingredient-grid
 
 
-        button#startTimerButton.button(onclick='startTimer()') Lancer le chronom&egrave;tre
+        button#startTimerButton.button Lancer le chronom&egrave;tre
+        div#feedback.feedback
         ul#playerList
-    script(src='/script/game.js')
+    script(type="module", src='/script/game.js')
