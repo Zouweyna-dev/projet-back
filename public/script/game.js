@@ -6,29 +6,51 @@ console.log('game.js is loaded');
 const token = window.localStorage.getItem('token');
 console.log('toooken1:', token);
 
-    function onRoomCreated(data) {
-        console.log('Joueurs dans la salle player 1:', data.player1);
-        console.log('Joueurs dans la salle player 2:', data.player2);
+function onRoomCreated(data) {
+    console.log('Joueurs dans la salle player 1:', data.player1);
+    console.log('Joueurs dans la salle player 2:', data.player2);
 
-    }
 
-    window.socket = connectSocket(token, onRoomCreated, updatePlayerList);
-    // const socket=window.socket;
+}
 
-    let tablePlayer={}
+window.socket = connectSocket(token, onRoomCreated, updatePlayerList);
+// const socket=window.socket;
+let player1;
+let player2;
+let tablePlayer={}
+let currentRoom;
+
 console.log("je suis dans game")
 window.socket.on('roomReady', function (data) {
-        console.log('Room', data.roomID, 'is ready');
-        console.log('Joueurs dans la salle player 1:', data.player1);
-        console.log('Joueurs dans la salle player 2:', data.player2);
+    console.log('Room', data.roomID, 'is ready');
+    //currentRoom= data.roomID;
+    console.log('Joueurs dans la salle player 1:', data.player1);
+    console.log('Joueurs dans la salle player 2:', data.player2);
+    player1=data.player1;
+    player2=data.player2;
 
-     updatePlayerList([data.player1, data.player2]);
-     updatePlayerNames(data.player1, data.player2);
 
+    updatePlayerList([data.player1, data.player2]);
+    updatePlayerNames(data.player1, data.player2);
+
+
+    document.getElementById('recipe').textContent =
+        `Recette: ${data.recipe}`;
+    correctIngredients = data.ingredients;
+    shuffleArray(data.allIngredients);
+    const playerGrid = document.getElementById('player-grid');
+    playerGrid.innerHTML = '';
+
+    data.allIngredients.forEach(ingredient => {
+        const button1 = createIngredientButton(ingredient, 1);
+        playerGrid.appendChild(button1);
     });
+    initGame();
 
-
-   // }
+//console.log("currentroom dans roomdredyyy",currentRoom)
+});
+console.log("currentroom apres roomdredyyy",currentRoom)
+// }
 function updatePlayerNames(player1, player2) {
     document.getElementById('player1Name').textContent = player1;
     document.getElementById('player2Name').textContent = player2;
@@ -47,23 +69,35 @@ console.log("sockeeeeeettt")
 // Écoutez l'événement 'startGame' au chargement du jeu
 
 console.log("socket",window.socket)
-startButton.addEventListener('click', () => {
-    window.socket.emit('startGame'); // Émet l'événement 'startGame' au serveur
-});
-    window.socket.on('gameData', function(data) {
-        document.getElementById('recipe').textContent =
-            `Recette: ${data.recipe}`;
-        correctIngredients = data.ingredients;
-        shuffleArray(data.allIngredients);
-        const playerGrid = document.getElementById('player-grid');
-        playerGrid.innerHTML = '';
+console.log("currentroom avant joinGame",currentRoom)
 
-        data.allIngredients.forEach(ingredient => {
-            const button1 = createIngredientButton(ingredient, 1);
-            playerGrid.appendChild(button1);
-        });
-        initGame();
-    });
+
+window.socket.emit('joinGame', currentRoom);
+
+//window.socket.emit('joinGame', currentRoom);
+startButton.addEventListener('click', () => {
+
+   // window.socket.emit('joinGame', currentRoom);
+    window.socket.emit('startGame');
+    // Émet l'événement 'startGame' au serveur
+});
+
+
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function initGame() {
+    resetTimer();
+    enableStartTimerButton();
+}
+window.socket.on('room', function(data) {
+
+});
 
 
 // Écoutez l'événement de mise à jour du chronomètre
@@ -74,7 +108,7 @@ window.socket.on('updateTimer', (timeLeft) => {
 // Écoutez l'événement de fin de jeu
 
 
-    // initGame();
+// initGame();
 
 console.log("nooon")
 
@@ -94,10 +128,6 @@ function enableStartTimerButton() {
 }
 
 // Écoutez la fin du jeu
-window.socket.on('endGame', (message) => {
-    alert(message);
-    initGame();
-});
 
 // Créez un bouton pour chaque ingrédient
 function createIngredientButton(ingredient, playerNumber) {
@@ -112,7 +142,6 @@ function createIngredientButton(ingredient, playerNumber) {
 
 // Mettez à jour les scores des joueurs
 
-
 window.socket.on('updateScores', (playerScores) => {
     // Vérifiez si playerScores a bien été reçu
 
@@ -120,13 +149,24 @@ window.socket.on('updateScores', (playerScores) => {
     console.log('playerScores[playerScores.player1] ',playerScores[playerScores.player1] )
 
     // Met à jour l'affichage des scores
-    document.getElementById('player1score').textContent = playerScores[playerScores.player1] || 0; // Défaut à 0 si undefined
+
+    document.getElementById('player1score').textContent = playerScores[playerScores.player1] || 0;
     document.getElementById('player2score').textContent = playerScores[playerScores.player2] || 0;
 
-    // Log des scores pour débogage
+     // Log des scores pour débogage
     console.log("Score du joueur 1:", playerScores.player1);
     console.log("Score du joueur 2:", playerScores.player2);
 });
+
+
+
+    window.socket.on('updateMessage',({message, player}) => {
+        if(player === player1) {
+            document.getElementById('player1status').textContent = message;
+        } else if(player === player2){
+            document.getElementById('player2status').textContent = message;
+        }
+    });
 
 // Sélectionnez un ingrédient
 function selectIngredient({ ingredient, player }) {
@@ -144,14 +184,32 @@ window.socket.on('disableIngredient', (ingredient) => {
         }
     });
 });
-window.socket.on('disableIngredient', (ingredient) => {
-    const ingredientElement = document.getElementById(ingredient);
-    if (ingredientElement) {
-        ingredientElement.disabled = true;
-        // Désactive l'ingrédient dans l'UI
-        console.log(`L'ingrédient ${ingredient} a été désactivé.`);
+    function updateTimerDisplay() {
+        document.getElementById('timer').textContent = `Temps restant: ${timeLeft}s`;
     }
-});
+
+
+
+// Mélanger un tableau
+
+
+    window.socket.on('endGame', (message) => {
+        //alert(message);
+        //initGame(); // Réinitialiser le jeu pour un nouveau tour
+    });
+   // document.getElementById('player1status').textContent = `Dommage, "${ingredient}" n'est pas un ingrédient de cette recette.`;
+    //document.getElementById('player2status').textContent = `Bien joué ! "${ingredient}" est un bon ingrédient.`;
+
+
+
+// window.socket.on('disableIngredient', (ingredient) => {
+//     const ingredientElement = document.getElementById(ingredient);
+//     if (ingredientElement) {
+//         ingredientElement.disabled = true;
+//         // Désactive l'ingrédient dans l'UI
+//         console.log(`L'ingrédient ${ingredient} a été désactivé.`);
+//     }
+// });
 
 // Mettez à jour l'affichage des scores
 
@@ -173,28 +231,5 @@ window.socket.on('disableIngredient', (ingredient) => {
 // }
 
 
-function updateTimerDisplay() {
-    document.getElementById('timer').textContent = `Temps restant: ${timeLeft}s`;
-}
 
-
-
-// Initialiser le jeu
-function initGame() {
-    resetTimer();
-    enableStartTimerButton();
-}
-
-// Mélanger un tableau
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-window.socket.on('endGame', (message) => {
-    //alert(message);
-    //initGame(); // Réinitialiser le jeu pour un nouveau tour
-});
 

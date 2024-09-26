@@ -71,7 +71,7 @@ app.get("/index", (request, response) => {
 app.route('/subscribe')
 
     .get((req, res,next) => {
-      //  const { userName, email, password } = request.body;
+        //  const { userName, email, password } = request.body;
 
         console.log('route get');
 
@@ -92,47 +92,47 @@ app.route('/subscribe')
     })
 
     .post( async (request, response, next) => {
-    const { userName, email, password } = request.body;
-    console.log(request.body)
+        const { userName, email, password } = request.body;
+        console.log(request.body)
         if ((typeof userName === "string" && userName.trim() === "") ||
             (typeof email === 'string' && email.trim() === "") ||
             (typeof password === 'string' && password.length <1))  {
-        next({ status: 400, message: "Password must be at least 6 characters long!" });
-        console.log('ifff')
-        return;
-    }
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-console.log('tryyyy subscribe')
-        await client.connect();
-        const db = client.db(dbName);
-        const collection = db.collection("gamers");
-        const result = await collection.insertOne({
-            userName,
-            email,
-
-            password: hashedPassword,
-        });
-        const token = jwt.sign(
-            {
+            next({ status: 400, message: "Password must be at least 6 characters long!" });
+            console.log('ifff')
+            return;
+        }
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            console.log('tryyyy subscribe')
+            await client.connect();
+            const db = client.db(dbName);
+            const collection = db.collection("gamers");
+            const result = await collection.insertOne({
                 userName,
                 email,
-            },
-            jwtSecret
-        );
+
+                password: hashedPassword,
+            });
+            const token = jwt.sign(
+                {
+                    userName,
+                    email,
+                },
+                jwtSecret
+            );
 //a modifier
-        response.json({
-            token,
-        });
-    } catch (error) {
-        console.log(error);
-        next({ status: 500, message: "Internal Server Error" });
-    } finally {
-        console.log("Closing connection.");
-        client.close();
-        console.log('finally subscribe')
-    }
-});
+            response.json({
+                token,
+            });
+        } catch (error) {
+            console.log(error);
+            next({ status: 500, message: "Internal Server Error" });
+        } finally {
+            console.log("Closing connection.");
+            client.close();
+            console.log('finally subscribe')
+        }
+    });
 
 /**
  * Vérification d'un utilisateur
@@ -148,75 +148,75 @@ app.route('/login')
 
     })
 
-.post( async (request, response, next) => {
-    const { userName,password} = request.body;
-    console.log('post login ',request.body)
-    console.log('username',userName)
-    console.log('password',password)
+    .post( async (request, response, next) => {
+        const { userName,password} = request.body;
+        console.log('post login ',request.body)
+        console.log('username',userName)
+        console.log('password',password)
 
 
-    if (typeof userName === "undefined" || typeof password=== "undefined"
-        || userName.trim() === "" || password.trim() === "") {
-        console.log('erreuur');
-        next({ status: 400, message: "Invalid request parameters" });
-        return;
-    }
+        if (typeof userName === "undefined" || typeof password=== "undefined"
+            || userName.trim() === "" || password.trim() === "") {
+            console.log('erreuur');
+            next({ status: 400, message: "Invalid request parameters" });
+            return;
+        }
 
-    try {
-        await client.connect();
-        const db = client.db(dbName);
-        const collection = db.collection("gamers");
+        try {
+            await client.connect();
+            const db = client.db(dbName);
+            const collection = db.collection("gamers");
 
-        const user = await collection.findOne(
-            {
-                userName,
-            },
-            {
-                projection: {
-                    _id: 0,
-                    password: 1,
-                    userName: 1,
-                    email: 1,
+            const user = await collection.findOne(
+                {
+                    userName,
                 },
+                {
+                    projection: {
+                        _id: 0,
+                        password: 1,
+                        userName: 1,
+                        email: 1,
+                    },
+                }
+            );
+
+            if (!user) {
+                next({ status: 401, message: "Invalid user" });
+                return;
             }
-        );
 
-        if (!user) {
-            next({ status: 401, message: "Invalid user" });
-            return;
-        }
+            const validPassword = await bcrypt.compare(password, user.password);
 
-        const validPassword = await bcrypt.compare(password, user.password);
+            if (!validPassword) {
+                next({ status: 401, message: "Unauthorized" });
+                return;
+            }
 
-        if (!validPassword) {
-            next({ status: 401, message: "Unauthorized" });
-            return;
-        }
+            const token = jwt.sign(
+                {
+                    userName: user.userName,
+                    email: user.email,
+                    userId: user._id,
+                },
+                jwtSecret
+            );
+            response.cookie("token", token, { httpOnly: true });
 
-        const token = jwt.sign(
-            {
+            response.json({
                 userName: user.userName,
                 email: user.email,
                 userId: user._id,
-            },
-            jwtSecret
-        );
-        response.cookie("token", token, { httpOnly: true });
-
-        response.json({
-            userName: user.userName,
-            email: user.email,
-            userId: user._id,
-            token,
-        });
-    } catch (error) {
-        console.log(error);
-        next({ status: 500, message: "Internal Server Error" });
-    } finally {
-        console.log("Closing connection.");
-        client.close();
-    }
-});
+                token,
+            });
+        } catch (error) {
+            console.log(error);
+            next({ status: 500, message: "Internal Server Error" });
+        } finally {
+            console.log("Closing connection.");
+            client.close();
+        }
+    });
 
 /**
  * Middleware pour vérifier le jeton JWT.
@@ -263,18 +263,18 @@ app.get("/game", async (req, res, next) => {
 
     try {
         const payload = jwt.verify(token, jwtSecret);
-       const userName = payload.userName;
- console.log("username",userName)
+        const userName = payload.userName;
+        console.log("username",userName)
         res.render('game');
-   } catch (error) {
+    } catch (error) {
         // Gérez l'erreur ici,
         //probablement en redirigeant vers la page de connexion.
-   }
+    }
 });
-    app.get('/gameSelection',(req,res)=>{
+app.get('/gameSelection',(req,res)=>{
 
 
-        return res.render('gameSelection')
+    return res.render('gameSelection')
 })
 app.post('/start-game', async (req, res) => {
 
@@ -435,7 +435,7 @@ const ingredients = [
     "Farine", "Sucre", "Beurre", "Œufs", "Lait", "Levure chimique",
     "Chocolat noir", "Crème fraîche", "Vanille", "Fraises", "Citron",
     "Amandes", "Noix de coco", "Crème au beurre", "Poudre d'amandes",
-    "Mascarpone", "Café fort", "Cacao en poudre"
+    "Mascarpone", "Café fort", "Cacao en poudre,Chocolat blanc","Fromage", "Courgette"
 ];
 
 // Ajoutez les recettes ici comme avant
@@ -461,13 +461,15 @@ const recipes = [
         ingredients: ["Farine", "Sucre", "Beurre", "Œufs", "Citron", "Levure chimique"]
     }
 ];
+let appelUnic=0;
+
 
 // Fonction pour générer une recette au hasard
 function getRandomRecipe() {
     return recipes[Math.floor(Math.random() * recipes.length)];
 
 }
-
+let  correctIngredients;
 let connectedUsers = [];
 let waitingRoom = null;
 let   ConnexionsSocket={};
@@ -493,8 +495,10 @@ ioServer.on('connection', (socket) => {
 
     if (decodedToken && decodedToken.userName) {
         socket.username = decodedToken.userName;
-        socket.emit('joinGame', socket.username);
-        socket.emit('welcome', { message: 'Welcome to the game!' });
+
+        //socket.emit('joinGame', socket.username);
+      socket.emit('welcome', { message: 'Welcome to the game!' });
+
 
         if (!connectedUsers.includes(socket.username)) {
             connectedUsers.push(socket.username);
@@ -516,179 +520,159 @@ ioServer.on('connection', (socket) => {
             socket.join(waitingRoom.roomId);
             waitingRoom.player2 = socket.username;
             console.log(`User ${socket.username} joined room`);
+             let randomRecipe = getRandomRecipe();
+             correctIngredients = randomRecipe.ingredients;
             ioServer.to(waitingRoom.roomId).emit('roomReady', {
+
                 roomID: waitingRoom.roomId,
                 player1: waitingRoom.player1,
-                player2: waitingRoom.player2
+                player2: waitingRoom.player2,
+                recipe: randomRecipe.name,
+                ingredients: randomRecipe.ingredients ,
+                allIngredients: ingredients
             });
+console.log("recete,ingrediant",randomRecipe,randomRecipe.ingredients,)
+            console.log("roomReadyyyyyyyyyyyyyyyy",  waitingRoom.player1,
+                waitingRoom.player2);
 
-           // startGame(waitingRoom.roomId);
+            // startGame(waitingRoom.roomId);
             waitingRoom = null; // Réinitialise la room d'attente
         } else if (!existingRoom) {
             // Si aucune room n'existe, crée une nouvelle room
             const newRoomId = 'room-' + Math.random().toString(36).substr(2, 9);
             socket.join(newRoomId);
-              console.log(`Room ${newRoomId} created for user ${socket.username}`);
+            console.log(`Room ${newRoomId} created for user ${socket.username}`);
             console.log('waitingRoom', waitingRoom);
             console.log("première création de room", newRoomId);
             waitingRoom = { roomId: newRoomId, player1: socket.username };
             ioServer.to(newRoomId).emit('roomCreated', { roomID: newRoomId, player1: socket.username });
         }
-        if (!playerScores.player1) {
-            playerScores.player1 = socket.username; // Assigner le joueur 1
-        } else if (!playerScores.player2) {
-            playerScores.player2 = socket.username; // Assigner le joueur 2
-        }
+
         const currentRoom = Array.from(socket.rooms).find(roomId =>
             roomId.startsWith('room-'));
         console.log("currentRoom",currentRoom);
         console.log("socket",socket.username);
-        // Logique pour démarrer le jeu si les deux joueurs sont présents
-        if (playerScores.player1 && playerScores.player2) {
-            ioServer.to(currentRoom).emit('startGame', {
-                player1: playerScores.player1,
-                player2: playerScores.player2
-            });
-        }
+
+    if (!playerScores.player1) {
+        playerScores.player1 = socket.username; // Assigner le joueur 1
+    } else if (!playerScores.player2) {
+        playerScores.player2 = socket.username; // Assigner le joueur 2
+    }
+
+    console.log('avant if ',currentRoom );
 
 
-        let correctIngredients;
-        if (currentRoom) {
-            const randomRecipe = getRandomRecipe();
-            correctIngredients = randomRecipe.ingredients;
+    if (currentRoom) {
 
         socket.on('startGame', () => {
 
-            console.log("currentRoom",currentRoom);
-            console.log("correctIngredients ",correctIngredients );
+                console.log("currentRoom",currentRoom);
+                console.log("correctIngredients ",correctIngredients );
 
-            console.log('socket rooms', Array.from(socket.rooms));
-            console.log('socket user name', socket.username)
+                console.log('socket rooms', Array.from(socket.rooms));
+                console.log('socket user name', socket.username)
 
-            ioServer.to(currentRoom).emit('gameData', {
-                recipe: randomRecipe.name,
-                ingredients: randomRecipe.ingredients,
-                allIngredients: ingredients
+
+                console.log('Event "startGame" received');
+
+                startTimer(currentRoom);
+
+
             });
-            console.log('Données de jeu émises:', {
-                recipe: randomRecipe.name,
-                ingredients: randomRecipe.ingredients,
-                allIngredients: ingredients
-            });
-            console.log('Event "startGame" received');
-            startTimer(currentRoom);
 
-        });
             function startTimer(currentRoom) {
-                let timeLeft = 30; // Durée du jeu en secondes
+                let timeLeft = 40; // Durée du jeu en secondes
                 const timerInterval = setInterval(() => {
                     timeLeft--;
-                    // Émet le temps restant à tous les joueurs dans la salle
-                    ioServer.to(currentRoom).emit('updateTimer', timeLeft);
 
-                    // Appeler checkWinCondition pour vérifier à chaque seconde
+                    ioServer.to(currentRoom).emit('updateTimer', timeLeft);
                     checkWinCondition(currentRoom, correctIngredients.length, timeLeft);
 
                     if (timeLeft <= 0) {
-                        clearInterval(timerInterval); // Arrêter le timer quand il atteint 0
+                        clearInterval(timerInterval);
                         endGame(currentRoom);
                     }
-                }, 1000); // Décrémenter chaque seconde
+                }, 1000);
             }
 
-            // Générer une recette aléatoire
-                // Diffuser les données de la recette et tous les ingrédients possibles à tous les joueurs
+            socket.on('selectIngredient', ({ ingredient, player }) => {
+                let message;
+                player= socket.username;
+                console.log("player", player);
+                console.log(`Le joueur ${player} a sélectionné ${ingredient}`);
+                console.log('Ingrédients corrects:', correctIngredients);
+                console.log('Ingrédient sélectionné:', ingredient);
+                console.log('Scores actuels:', playerScores);
 
-                socket.on('selectIngredient', ({ ingredient, player }) => {
-                    player= socket.username;
-                    console.log("player", player);
-                    console.log(`Le joueur ${player} a sélectionné ${ingredient}`);
-                    console.log('Ingrédients corrects:', correctIngredients);
-                    console.log('Ingrédient sélectionné:', ingredient);
-                    console.log('Scores actuels:', playerScores);
-                    if (correctIngredients && correctIngredients.includes(ingredient)) {
+                if (correctIngredients && correctIngredients.includes(ingredient)) {
 
-                        if (!playerScores[player]) {
-                            playerScores[player] = 0; // Initialise le score si nécessaire
-                        }
-                        // Mettre à jour le score du joueur
-                        playerScores[player] = playerScores[player] + 1; // Incrémente le score
-
-                        ioServer.to(currentRoom).emit('disableIngredient', ingredient);
-
-                        ioServer.to(currentRoom).emit('updateScores', playerScores);
-
-                        // Vérifier si quelqu'un a gagné
-                        checkWinCondition(currentRoom, correctIngredients.length);
+                    if (!playerScores[player]) {
+                        playerScores[player] = 0; // Initialise le score si nécessaire
                     }
-                 else {
-                console.log(`${ingredient} n'est pas un ingrédient correct ou correctIngredients est vide.`);
-            }
-                });
+                    // Mettre à jour le score du joueur
+                    playerScores[player] = playerScores[player] + 1; // Incrémente le score
+                    message='bien joué :) !';
+                    ioServer.to(currentRoom).emit('disableIngredient', ingredient);
+                    ioServer.to(currentRoom).emit('updateScores', playerScores);
+
+                    // Vérifier si quelqu'un a gagné
+                    checkWinCondition(currentRoom, correctIngredients.length);
+                }
+                else {
+                    message='Essaie encore :( !!';
+                    console.log(`${ingredient} n'est pas un ingrédient correct ou correctIngredients est vide.`);
+                }
+                ioServer.to(currentRoom).emit('updateMessage',{ message,player});
+            });
 
             function checkWinCondition(roomId, totalCorrectIngredients,timeLeft) {
                 const player1Score = playerScores.player1 ;
                 const player2Score = playerScores.player2;
+                let message;
 
-               // Différence de score minimale pour qu'un joueur gagne
-
-                // Vérifier si un des joueurs a trouvé tous les ingrédients corrects
                 if (player1Score === totalCorrectIngredients) {
-                    ioServer.to(roomId).emit('endGame', 'Player 1 wins!');
+                   message= `${playerScores.player1} wins!`
                 } else if (player2Score === totalCorrectIngredients) {
-                    ioServer.to(roomId).emit('endGame', 'Player 2 wins!');
+                    message= `${playerScores.player2} wins!`
                 }
                 if (timeLeft <= 0) {
                     if (player1Score > player2Score) {
-                        ioServer.to(roomId).emit('endGame', 'Player 1 wins with a higher score!');
+                        message=`${playerScores.player1} wins with a higher score!`;
                     } else if (player2Score > player1Score) {
-                        ioServer.to(roomId).emit('endGame', 'Player 2 wins with a higher score!');
+                        message=`${playerScores.player2} wins with a higher score!`;
                     } else {
-                        ioServer.to(roomId).emit('endGame', 'It\'s a tie!');
+                        message='It\'s a tie!';
                     }
                 }
+
+                ioServer.to(roomId).emit('endGame',message);
             }
 
-            // if (player1Score === correctIngredientsLength ||
-                    //     player2Score === correctIngredientsLength) {
-                    //
-                    //
-                        // let message;
-                        // if (player1Score > player2Score) {
-                        //     ioServer.to(roomId).emit('endGame', 'Player 1 wins!');
-                        //     message = `Le Pâtissier 1 gagne avec un score de ${player1Score} !`;
-                        // } else if (player2Score > player1Score) {
-                        //     message = `Le Pâtissier 2 gagne avec un score de ${player2Score} !`;
-                        // } else {
-                        //     message = `Égalité ! Les deux pâtissiers ont un score de ${player1Score}.`;
-                        // }
-                        //
-                        // ioServer.to(roomId).emit('endGame', message);
-
-                        // Réinitialiser les scores
-                        // playerScores[players[0]] = 0;
-                        // playerScores[players[1]] = 0;
 
             function endGame(roomId) {
+
+                let message;
                 const player1Score = playerScores.player1 || 0;
                 const player2Score = playerScores.player2 || 0;
 
                 if (player1Score > player2Score) {
-                    ioServer.to(roomId).emit('endGame', 'Player 1 wins with more points!');
+                    message='Player 1 wins with more points!';
                 } else if (player2Score > player1Score) {
-                    ioServer.to(roomId).emit('endGame', 'Player 2 wins with more points!');
+                    message ='Player 2 wins with more points!';
                 } else {
-                    ioServer.to(roomId).emit('endGame', 'It\'s a tie!');
-                }
-            }
-
+                    message='It\'s a tie!';
                 }
 
-            else {
-                console.error('Aucune room trouvée pour démarrer le jeu.');
+                ioServer.to(roomId).emit('endGame',message);
             }
 
+        }
 
+
+
+        else {
+            console.error('Aucune room trouvée pour démarrer le jeu.');
+        }
 
     }
 
@@ -699,6 +683,8 @@ ioServer.on('connection', (socket) => {
             waitingRoom = null;
         }
     });
+
+
 });
 
 

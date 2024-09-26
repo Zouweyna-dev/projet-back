@@ -21,4 +21,9 @@
 3. Lancez le serveur avec `node app.js`.
 
 ## Notes
-- Pensez à configurer votre fichier .env pour les variables d'environnement.
+
+Les événements de socket connection, disconnect, startGame, joinGame, selectIngredient.
+roomsState, un objet qui stocke des informations sur chaque salle de jeu, y compris les joueurs dans la salle, la recette aléatoire pour la salle, etc.
+startTimer: une fonction pour gérer la logique du décompte à rebours du jeu.
+checkWinCondition et endGame: fonctions qui vérifient si un joueur a gagné et terminent le jeu.
+Gestion de l'attente du joueur et assignation aux salles de jeux.on aux salles de jeux.

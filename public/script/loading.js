@@ -32,7 +32,7 @@ let gameStarted = false;
 
     if (startButton) {
         startButton.addEventListener('click', () => {
-            window.location.href = '/api/game';
+            window.location.href = '/game';
             console.log('La partie commence !');
             // socket.emit('startGame');
         });

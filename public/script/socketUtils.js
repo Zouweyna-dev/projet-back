@@ -1,6 +1,6 @@
 
 export function connectSocket(token, onRoomCreated, onUsersUpdated) {
-    const socket = io.connect('http://192.168.1.98', {
+    const socket = io.connect('', {
         query: { token: token },
         reconnection: true,
         reconnectionAttempts: 5,
@@ -13,6 +13,8 @@ export function connectSocket(token, onRoomCreated, onUsersUpdated) {
 
         socket.on('roomCreated', (data) => {
             console.log('Événement roomCreated reçu:', data);
+
+
             if (onRoomCreated) {
                 onRoomCreated(data);
                 console.log("data", data.player1)
