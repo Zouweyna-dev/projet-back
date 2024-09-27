@@ -532,7 +532,8 @@ ioServer.on('connection', (socket) => {
                         message = 'Essaie encore :( !!';
                     }
 
-                    ioServer.to(waitingRoom.roomId).emit('updateMessage', {message, player});
+                    ioServer.to(waitingRoom.roomId).emit('updateMessage', message,player);
+
                 });
 
 
@@ -561,13 +562,13 @@ ioServer.on('connection', (socket) => {
                     }
                 }
 
-                    socket.on('playerQuit', ({ roomId, player }) => {
+                    socket.on('playerQuit', (roomId) => {
                         // Informer l'autre joueur dans la salle que quelqu'un a quitté
-                        socket.to(roomId).emit('playerLeft', { player: player, message: `${player} a quitté la partie.` });
-
-                        // Déconnecter le joueur
+                        socket.to(roomId).emit('playerLeft',
+                            { player: socket.username, message: `${socket.username} a quitté la partie.` });
+console.log("player quit",socket.username )                        // Déconnecter le joueur
                         socket.leave(roomId);
-                        console.log(`${player} a quitté la salle ${roomId}`);
+                        //console.log(`${player} a quitté la salle ${roomId}`);
                     });
 
 

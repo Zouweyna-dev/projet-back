@@ -163,12 +163,12 @@ window.socket.on('updateScores', function(players) {
     console.log("Score du joueur 2:", players[1]?.username, players[1]?.score);
 });
 
-    window.socket.on('updateMessage',({message, player}) => {
+    window.socket.on('updateMessage',(message, player) => {
 
         console.log("je suis dans updatemessage",player)
-        if(player === player1) {
+        if(player.username === player1) {
             document.getElementById('player1status').textContent = message;
-        } else if(player === player2){
+        } else if(player.username === player2){
             document.getElementById('player2status').textContent = message;
         }
     });
@@ -181,12 +181,13 @@ function updateTimerDisplay() {
 const quitButton = document.getElementById('quitButton');
 quitButton.addEventListener('click', () => {
     // Émettre un événement au serveur pour informer de la déconnexion
-    socket.emit('playerQuit', { roomId: localStorage.getItem('roomId'), player: socket.username });
+    window.socket.emit('playerQuit',roomId);
+
+    console.log("playerQuit");
 });
-socket.on('playerLeft', ({ player, message }) => {
+ window.socket.on('playerLeft', ({ player, message }) => {
     // Afficher un message à l'autre joueur
     alert(message);
-
     // Optionnel : Mettre à jour l'interface pour refléter le départ du joueur
     // Par exemple, vous pouvez désactiver les boutons ou rediriger l'utilisateur
 });
