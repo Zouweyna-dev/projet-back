@@ -41,16 +41,16 @@ let gameStarted = false;
     }
 
 }
-
-export function updatePlayerList(users) {
-    const playerList = document.getElementById('playerList');
-    if (!Array.isArray(users)) {
-        users = [users];
-    }
-    playerList.innerHTML = "";
-    users.forEach(user => {
-        const newPlayer = document.createElement('li');
-        newPlayer.textContent = `${user} est connecté`;
-        playerList.appendChild(newPlayer);
-    });
-}
+//
+// function updatePlayerList(users) {
+//     const playerList = document.getElementById('playerList');
+//     if (!Array.isArray(users)) {
+//         users = [users];
+//     }
+//     playerList.innerHTML = "";
+//     users.forEach(user => {
+//         const newPlayer = document.createElement('li');
+//         newPlayer.textContent = `${user} est connecté`;
+//         playerList.appendChild(newPlayer);
+//     });
+// }

@@ -4,16 +4,14 @@ import bodyParser from "body-parser"; // Permet de parser le corps des requêtes
 import cors from "cors"; // Permet de paramétrer les en-têtes CORS
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { v4 } from 'uuid';
-import { Server } from 'socket.io'
+import {v4} from 'uuid';
+import {Server} from 'socket.io'
 import res from "express/lib/response.js";
-import  path from "path";
+import path from "path";
 import compression from "compression";
 import {MongoClient, ObjectId} from "mongodb"; // https://www.mongodb.com/docs/drivers/node/current/
-import { apiStatus } from "./api-status.js";
+import {apiStatus} from "./api-status.js";
 import crypto from 'crypto';
-
-
 
 
 const dbName = "Game";
@@ -24,10 +22,6 @@ import * as http from "http";
 
 
 const app = express();
-
-// app.use(cors({
-//     origin: 'http://192.168.1.98'
-// }));
 
 const jwtSecret = crypto.randomBytes(64).toString('hex');
 console.log(jwtSecret);
@@ -70,34 +64,28 @@ app.get("/index", (request, response) => {
  */
 app.route('/subscribe')
 
-    .get((req, res,next) => {
+    .get((req, res, next) => {
         //  const { userName, email, password } = request.body;
 
         console.log('route get');
 
-        return res.render(
-            'subscribe',
-            {
-                title: 'Inscription',
-            },
-            (err, html) => {
-                if (err) {
-                    return next(err.message);
-                }
-                if (html) {
-                    return res.send(html);
-                }
-            },
-        );
+        return res.render('subscribe', {
+            title: 'Inscription',
+        }, (err, html) => {
+            if (err) {
+                return next(err.message);
+            }
+            if (html) {
+                return res.send(html);
+            }
+        },);
     })
 
-    .post( async (request, response, next) => {
-        const { userName, email, password } = request.body;
+    .post(async (request, response, next) => {
+        const {userName, email, password} = request.body;
         console.log(request.body)
-        if ((typeof userName === "string" && userName.trim() === "") ||
-            (typeof email === 'string' && email.trim() === "") ||
-            (typeof password === 'string' && password.length <1))  {
-            next({ status: 400, message: "Password must be at least 6 characters long!" });
+        if ((typeof userName === "string" && userName.trim() === "") || (typeof email === 'string' && email.trim() === "") || (typeof password === 'string' && password.length < 1)) {
+            next({status: 400, message: "Password must be at least 6 characters long!"});
             console.log('ifff')
             return;
         }
@@ -108,25 +96,20 @@ app.route('/subscribe')
             const db = client.db(dbName);
             const collection = db.collection("gamers");
             const result = await collection.insertOne({
-                userName,
-                email,
+                userName, email,
 
                 password: hashedPassword,
             });
-            const token = jwt.sign(
-                {
-                    userName,
-                    email,
-                },
-                jwtSecret
-            );
+            const token = jwt.sign({
+                userName, email,
+            }, jwtSecret);
 //a modifier
             response.json({
                 token,
             });
         } catch (error) {
             console.log(error);
-            next({ status: 500, message: "Internal Server Error" });
+            next({status: 500, message: "Internal Server Error"});
         } finally {
             console.log("Closing connection.");
             client.close();
@@ -148,17 +131,16 @@ app.route('/login')
 
     })
 
-    .post( async (request, response, next) => {
-        const { userName,password} = request.body;
-        console.log('post login ',request.body)
-        console.log('username',userName)
-        console.log('password',password)
+    .post(async (request, response, next) => {
+        const {userName, password} = request.body;
+        console.log('post login ', request.body)
+        console.log('username', userName)
+        console.log('password', password)
 
 
-        if (typeof userName === "undefined" || typeof password=== "undefined"
-            || userName.trim() === "" || password.trim() === "") {
+        if (typeof userName === "undefined" || typeof password === "undefined" || userName.trim() === "" || password.trim() === "") {
             console.log('erreuur');
-            next({ status: 400, message: "Invalid request parameters" });
+            next({status: 400, message: "Invalid request parameters"});
             return;
         }
 
@@ -167,51 +149,37 @@ app.route('/login')
             const db = client.db(dbName);
             const collection = db.collection("gamers");
 
-            const user = await collection.findOne(
-                {
-                    userName,
+            const user = await collection.findOne({
+                userName,
+            }, {
+                projection: {
+                    _id: 0, password: 1, userName: 1, email: 1,
                 },
-                {
-                    projection: {
-                        _id: 0,
-                        password: 1,
-                        userName: 1,
-                        email: 1,
-                    },
-                }
-            );
+            });
 
             if (!user) {
-                next({ status: 401, message: "Invalid user" });
+                next({status: 401, message: "Invalid user"});
                 return;
             }
 
             const validPassword = await bcrypt.compare(password, user.password);
 
             if (!validPassword) {
-                next({ status: 401, message: "Unauthorized" });
+                next({status: 401, message: "Unauthorized"});
                 return;
             }
 
-            const token = jwt.sign(
-                {
-                    userName: user.userName,
-                    email: user.email,
-                    userId: user._id,
-                },
-                jwtSecret
-            );
-            response.cookie("token", token, { httpOnly: true });
+            const token = jwt.sign({
+                userName: user.userName, email: user.email, userId: user._id,
+            }, jwtSecret);
+            response.cookie("token", token, {httpOnly: true});
 
             response.json({
-                userName: user.userName,
-                email: user.email,
-                userId: user._id,
-                token,
+                userName: user.userName, email: user.email, userId: user._id, token,
             });
         } catch (error) {
             console.log(error);
-            next({ status: 500, message: "Internal Server Error" });
+            next({status: 500, message: "Internal Server Error"});
         } finally {
             console.log("Closing connection.");
             client.close();
@@ -229,7 +197,7 @@ app.use("/api/*", (request, response, next) => {
     console.log("Requête API reçue : ", request.method, request.originalUrl);
     const authorizationHeader = request.get("Authorization");
 
-    console.log('authorizationHeader ',authorizationHeader )
+    console.log('authorizationHeader ', authorizationHeader)
     let token = null;
     if (authorizationHeader) {
         token = authorizationHeader.trim().split(" ").pop();
@@ -249,10 +217,9 @@ app.use("/api/*", (request, response, next) => {
         // Si la vérification réussit, on ajoute le jeton et les données décodées
         // dans la requête.
         request.token = {
-            token,
-            decodedToken,
+            token, decodedToken,
         };
-        console.log('request token',request.token)
+        console.log('request token', request.token)
         request.token = decodedToken;
 
         next();
@@ -264,21 +231,23 @@ app.get("/game", async (req, res, next) => {
     try {
         const payload = jwt.verify(token, jwtSecret);
         const userName = payload.userName;
-        console.log("username",userName)
+        console.log("username", userName)
         res.render('game');
     } catch (error) {
         // Gérez l'erreur ici,
         //probablement en redirigeant vers la page de connexion.
     }
 });
-app.get('/gameSelection',(req,res)=>{
+
+
+app.get('/gameSelection', (req, res) => {
 
 
     return res.render('gameSelection')
 })
 app.post('/start-game', async (req, res) => {
 
-    console.log('token',req.cookies.token);
+    console.log('token', req.cookies.token);
 
     const userName = req.cookies.token.userName;
     const userId = req.cookies.token.userId;
@@ -291,8 +260,7 @@ app.post('/start-game', async (req, res) => {
 
     // Créer une nouvelle session de jeu avec l'ID et le nom d'utilisateur du joueur
     let gameSession = {
-        player1: { userId: userId, userName: userName, score: 0 },
-        player2: null
+        player1: {userId: userId, userName: userName, score: 0}, player2: null
     };
 
     try {
@@ -304,7 +272,7 @@ app.post('/start-game', async (req, res) => {
         console.log('Session de jeu insérée avec succès:', result);
         const gameSessionId = result.insertedId;
 
-        res.json({ gameSessionId: gameSessionId });
+        res.json({gameSessionId: gameSessionId});
     } catch (error) {
         console.error('Erreur lors de l\'insertion de la session de jeu:', error);
         res.status(500).send('Erreur interne du serveur.');
@@ -320,10 +288,10 @@ app.get('/active-games', async (req, res) => {
         const db = client.db(dbName);
         const gameCollection = db.collection("gameSessions");
 
-        const activeGames = await gameCollection.find({ player2: null }).toArray();
+        const activeGames = await gameCollection.find({player2: null}).toArray();
         console.log('Active games:', activeGames); // Ajoutez cette ligne pour vérifier les sessions actives
 
-        res.json({ games: activeGames });
+        res.json({games: activeGames});
     } catch (error) {
         console.error('Erreur lors de la récupération des sessions de jeu actives:', error);
         res.status(500).send('Erreur interne du serveur.');
@@ -346,7 +314,7 @@ app.post('/join-game/:gameSessionId', async (req, res) => {
         const db = client.db(dbName);
         const gameCollection = db.collection("gameSessions");
 
-        const gameSession = await gameCollection.findOne({ _id: new ObjectId(gameSessionId) });
+        const gameSession = await gameCollection.findOne({_id: new ObjectId(gameSessionId)});
 
         // Vérifier si la session de jeu existe et si le deuxième joueur peut rejoindre
         if (!gameSession || gameSession.player2) {
@@ -354,13 +322,10 @@ app.post('/join-game/:gameSessionId', async (req, res) => {
         }
 
         // Ajout du deuxième joueur à la session
-        gameSession.player2 = { userId: userId, userName: userName, score: 0 };
+        gameSession.player2 = {userId: userId, userName: userName, score: 0};
 
         // Mettre à jour la session de jeu en base de données
-        await gameCollection.updateOne(
-            { _id: new ObjectId(gameSessionId) },
-            { $set: { player2: gameSession.player2 } }
-        );
+        await gameCollection.updateOne({_id: new ObjectId(gameSessionId)}, {$set: {player2: gameSession.player2}});
 
         res.send("Rejoint le jeu avec succès.");
     } catch (error) {
@@ -403,13 +368,12 @@ app.post('/join-game/:gameSessionId', async (req, res) => {
 // });
 
 
-
 /**
  * Route de test, accessible uniquement si le middleware /api/* a vérifié
  * le jeton JWT.
  */
 
-app.get("/loading",(req,res)=>{
+app.get("/loading", (req, res) => {
 
     return res.render("loading")
 });
@@ -425,43 +389,26 @@ const httpServer = app.listen(80, () => {
 
 const ioServer = new Server(httpServer, {
     cors: {
-        origin: "http://localhost",
-        methods: ["GET", "POST"]
+        origin: "http://localhost", methods: ["GET", "POST"]
     }
 });
 
 // Définissez les ingrédients ici pour qu'ils soient accessibles globalement
-const ingredients = [
-    "Farine", "Sucre", "Beurre", "Œufs", "Lait", "Levure chimique",
-    "Chocolat noir", "Crème fraîche", "Vanille", "Fraises", "Citron",
-    "Amandes", "Noix de coco", "Crème au beurre", "Poudre d'amandes",
-    "Mascarpone", "Café fort", "Cacao en poudre,Chocolat blanc","Fromage", "Courgette"
-];
+const ingredients = ["Farine", "Sucre", "Beurre", "Œufs", "Lait", "Levure chimique", "Chocolat noir", "Crème fraîche", "Vanille", "Fraises", "Citron", "Amandes", "Noix de coco", "Crème au beurre", "Poudre d'amandes", "Mascarpone", "Café fort", "Cacao en poudre,Chocolat blanc", "Fromage", "Courgette"];
 
 // Ajoutez les recettes ici comme avant
-const recipes = [
-    {
-        name: "Gâteau au Chocolat",
-        ingredients: ["Farine", "Sucre", "Beurre", "Œufs", "Chocolat noir", "Levure chimique"]
-    },
-    {
-        name: "Tarte aux Fraises",
-        ingredients: ["Farine", "Beurre", "Sucre", "Œufs", "Crème fraîche", "Fraises"]
-    },
-    {
-        name: "Tiramisu",
-        ingredients: ["Mascarpone", "Œufs", "Sucre", "Café fort", "Cacao en poudre"]
-    },
-    {
-        name: "Macarons",
-        ingredients: ["Poudre d'amandes", "Sucre", "Œufs", "Crème au beurre"]
-    },
-    {
-        name: "Gâteau au Citron",
-        ingredients: ["Farine", "Sucre", "Beurre", "Œufs", "Citron", "Levure chimique"]
-    }
-];
-let appelUnic=0;
+const recipes = [{
+    name: "Gâteau au Chocolat", ingredients: ["Farine", "Sucre", "Beurre", "Œufs", "Chocolat noir", "Levure chimique"]
+}, {
+    name: "Tarte aux Fraises", ingredients: ["Farine", "Beurre", "Sucre", "Œufs", "Crème fraîche", "Fraises"]
+}, {
+    name: "Tiramisu", ingredients: ["Mascarpone", "Œufs", "Sucre", "Café fort", "Cacao en poudre"]
+}, {
+    name: "Macarons", ingredients: ["Poudre d'amandes", "Sucre", "Œufs", "Crème au beurre"]
+}, {
+    name: "Gâteau au Citron", ingredients: ["Farine", "Sucre", "Beurre", "Œufs", "Citron", "Levure chimique"]
+}];
+let appelUnic = 0;
 
 
 // Fonction pour générer une recette au hasard
@@ -469,19 +416,14 @@ function getRandomRecipe() {
     return recipes[Math.floor(Math.random() * recipes.length)];
 
 }
-let  correctIngredients;
-let connectedUsers = [];
-let waitingRoom = null;
-let   ConnexionsSocket={};
-let playerScores = {
-    player1:0,
-    player2:0,
-};
+let waitingRoom = null; // Variable globale pour la room d'attente
+let playerScores = {}; // Initialisation des scores des joueurs
+let connectedUsers = []; // Liste des utilisateurs connectés
 
 
 ioServer.on('connection', (socket) => {
     console.log('Un client est connecté');
-
+    let newRoomId;
     const token = socket.handshake.query.token;
     let decodedToken;
     try {
@@ -496,321 +438,195 @@ ioServer.on('connection', (socket) => {
     if (decodedToken && decodedToken.userName) {
         socket.username = decodedToken.userName;
 
-        //socket.emit('joinGame', socket.username);
-      socket.emit('welcome', { message: 'Welcome to the game!' });
-
+        socket.emit('welcome', {message: 'Bienvenue dans le jeu !'});
 
         if (!connectedUsers.includes(socket.username)) {
             connectedUsers.push(socket.username);
         }
         console.log('connectedUsers:', connectedUsers);
+
         ioServer.emit('usersUpdated', connectedUsers);
 
-        console.log("je suis dans le serveur");
+
+        let correctIngredients = [];
+        // Gestion des joueurs qui démarrent une partie
+
+// Fonction pour démarrer le timer
+
+            if (!waitingRoom) {
+                // Si c'est le premier joueur, créer une nouvelle room
+                newRoomId = 'room-' + Math.random().toString(36).substr(2, 9);
+
+                socket.join(newRoomId);
+
+                waitingRoom = {
+                    roomId: newRoomId,
+                    players: [{ username: socket.username,actif:true}]
+                };
+                // Informer le joueur qu'il attend un adversaire
+                ioServer.to(newRoomId).emit('roomCreated',
+                    { roomID: newRoomId, player1:socket.username});
+            } else {
+
+                // Récupérer une recette aléatoire pour la partie
+                let randomRecipe = getRandomRecipe();
+                correctIngredients = randomRecipe.ingredients;
+                socket.join(waitingRoom.roomId);
 
 
 
-        // Vérifie si l'utilisateur est déjà dans une room
-        const existingRoom =
-            Object.keys(socket.rooms).find(roomId =>
-                roomId.startsWith('room-'));
+                console.log("waitingRoom.roomId",waitingRoom.roomId)
 
-        if (waitingRoom) {
-            // Si une room d'attente existe, ajoute le joueur à cette room
-            socket.join(waitingRoom.roomId);
-            waitingRoom.player2 = socket.username;
-            console.log(`User ${socket.username} joined room`);
-             let randomRecipe = getRandomRecipe();
-             correctIngredients = randomRecipe.ingredients;
-            ioServer.to(waitingRoom.roomId).emit('roomReady', {
-
-                roomID: waitingRoom.roomId,
-                player1: waitingRoom.player1,
-                player2: waitingRoom.player2,
-                recipe: randomRecipe.name,
-                ingredients: randomRecipe.ingredients ,
-                allIngredients: ingredients
-            });
-console.log("recete,ingrediant",randomRecipe,randomRecipe.ingredients,)
-            console.log("roomReadyyyyyyyyyyyyyyyy",  waitingRoom.player1,
-                waitingRoom.player2);
-
-            // startGame(waitingRoom.roomId);
-            waitingRoom = null; // Réinitialise la room d'attente
-        } else if (!existingRoom) {
-            // Si aucune room n'existe, crée une nouvelle room
-            const newRoomId = 'room-' + Math.random().toString(36).substr(2, 9);
-            socket.join(newRoomId);
-            console.log(`Room ${newRoomId} created for user ${socket.username}`);
-            console.log('waitingRoom', waitingRoom);
-            console.log("première création de room", newRoomId);
-            waitingRoom = { roomId: newRoomId, player1: socket.username };
-            ioServer.to(newRoomId).emit('roomCreated', { roomID: newRoomId, player1: socket.username });
-        }
-
-        const currentRoom = Array.from(socket.rooms).find(roomId =>
-            roomId.startsWith('room-'));
-        console.log("currentRoom",currentRoom);
-        console.log("socket",socket.username);
-
-    if (!playerScores.player1) {
-        playerScores.player1 = socket.username; // Assigner le joueur 1
-    } else if (!playerScores.player2) {
-        playerScores.player2 = socket.username; // Assigner le joueur 2
-    }
-
-    console.log('avant if ',currentRoom );
-
-
-    if (currentRoom) {
-
-        socket.on('startGame', () => {
-
-                console.log("currentRoom",currentRoom);
-                console.log("correctIngredients ",correctIngredients );
-
-                console.log('socket rooms', Array.from(socket.rooms));
-                console.log('socket user name', socket.username)
-
-
-                console.log('Event "startGame" received');
-
-                startTimer(currentRoom);
-
-
-            });
-
-            function startTimer(currentRoom) {
-                let timeLeft = 40; // Durée du jeu en secondes
-                const timerInterval = setInterval(() => {
-                    timeLeft--;
-
-                    ioServer.to(currentRoom).emit('updateTimer', timeLeft);
-                    checkWinCondition(currentRoom, correctIngredients.length, timeLeft);
-
-                    if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        endGame(currentRoom);
-                    }
-                }, 1000);
+                waitingRoom.players.push({ username: socket.username, actif: true,
+                    });
+                waitingRoom.players.forEach(player => {
+                    player.score = 0; // Initialiser le score à 0
+                });
+                console.log("waitingRoom.players",waitingRoom.players)
+                // Envoyer les détails du jeu aux deux joueurs (room prête)
+                ioServer.to(waitingRoom.roomId).emit('roomReady', {
+                    roomID: waitingRoom.roomId,
+                    players: waitingRoom.players,
+                    recipe: randomRecipe.name,
+                    ingredients: randomRecipe.ingredients,
+                    allIngredients: ingredients
+                });
             }
+                socket.on('startGame', () => {
 
-            socket.on('selectIngredient', ({ ingredient, player }) => {
-                let message;
-                player= socket.username;
-                console.log("player", player);
-                console.log(`Le joueur ${player} a sélectionné ${ingredient}`);
-                console.log('Ingrédients corrects:', correctIngredients);
-                console.log('Ingrédient sélectionné:', ingredient);
-                console.log('Scores actuels:', playerScores);
+                    console.log("waitingRoom jj",waitingRoom)
+                startTimer(waitingRoom.roomId);
 
-                if (correctIngredients && correctIngredients.includes(ingredient)) {
 
-                    if (!playerScores[player]) {
-                        playerScores[player] = 0; // Initialise le score si nécessaire
+                });
+                function startTimer(roomId) {
+                    let timeLeft = 40;
+
+                    const timerInterval = setInterval(() => {
+                        timeLeft--;
+                        ioServer.to(roomId).emit('updateTimer', timeLeft);
+                        checkWinCondition(roomId, correctIngredients.length, timeLeft);
+
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval); // Arrêter le timer
+                            endGame(roomId);
+                        }
+                    }, 1000); // Répéter chaque seconde
+                }
+
+                    function getPlayer(username) {
+                        return waitingRoom.players.find(player => player.username === username);
                     }
-                    // Mettre à jour le score du joueur
-                    playerScores[player] = playerScores[player] + 1; // Incrémente le score
-                    message='bien joué :) !';
-                    ioServer.to(currentRoom).emit('disableIngredient', ingredient);
-                    ioServer.to(currentRoom).emit('updateScores', playerScores);
 
-                    // Vérifier si quelqu'un a gagné
-                    checkWinCondition(currentRoom, correctIngredients.length);
-                }
-                else {
-                    message='Essaie encore :( !!';
-                    console.log(`${ingredient} n'est pas un ingrédient correct ou correctIngredients est vide.`);
-                }
-                ioServer.to(currentRoom).emit('updateMessage',{ message,player});
-            });
+                    socket.on('selectIngredient', ({ingredient}) => {
 
-            function checkWinCondition(roomId, totalCorrectIngredients,timeLeft) {
-                const player1Score = playerScores.player1 ;
-                const player2Score = playerScores.player2;
-                let message;
 
-                if (player1Score === totalCorrectIngredients) {
-                   message= `${playerScores.player1} wins!`
-                } else if (player2Score === totalCorrectIngredients) {
-                    message= `${playerScores.player2} wins!`
-                }
-                if (timeLeft <= 0) {
-                    if (player1Score > player2Score) {
-                        message=`${playerScores.player1} wins with a higher score!`;
-                    } else if (player2Score > player1Score) {
-                        message=`${playerScores.player2} wins with a higher score!`;
+                    let message;
+                    let player = getPlayer(socket.username);
+                    if (!player) { console.log(`Player with username ${socket.username} not found`);}
+                    console.log('playeeer dans select ',player);
+                   // const playerScore = getPlayerScore(player)
+                    console.log()
+                    if (correctIngredients.includes(ingredient)) {
+
+                        player.score++;  // Incrémenter le score du joueur qui a cliqué
+
+                        console.log("player",player.score);
+
+                        message = 'Bien joué :) !';
+                        ioServer.to(waitingRoom.roomId).emit('disableIngredient', ingredient); // Désactiver l'ingrédient pour les deux joueurs
+                        ioServer.to(waitingRoom.roomId).emit('updateScores',waitingRoom.players); // Mettre à jour les scores
+                        checkWinCondition(waitingRoom.roomId, correctIngredients.length);
+
+
                     } else {
-                        message='It\'s a tie!';
+                        message = 'Essaie encore :( !!';
+                    }
+
+                    // Envoyer un message de retour au joueur
+                    ioServer.to(waitingRoom.roomId).emit('updateMessage', {message, player});
+                });
+
+
+
+                    function endGame(roomId) {
+
+                    let message;
+                        const player1 = waitingRoom.players[0];
+                        const player2 = waitingRoom.players[1];
+
+                        const player1Score = getPlayer(player1) || 0;
+                        const player2Score = getPlayer(player2)|| 0;
+
+                    if (player1Score > player2Score) {
+                        message = 'Player 1 wins with more points!';
+                    } else if (player2Score > player1Score) {
+                        message = 'Player 2 wins with more points!';
+                    } else {
+                        message = 'It\'s a tie!';
+                    }
+
+                    // Envoyer le message de fin de partie
+                    ioServer.to(roomId).emit('endGame', message);
+                    }
+
+                function checkWinCondition(roomId, totalCorrectIngredients, timeLeft) {
+                    const player1 = waitingRoom.players[0];
+                    const player2 = waitingRoom.players[1];
+
+                    const player1Score = getPlayer(player1) || 0;
+                    const player2Score = getPlayer(player2)|| 0;
+
+                    let message = null;
+
+                    // Vérification si un joueur a trouvé tous les ingrédients corrects
+                    if (player1Score === totalCorrectIngredients || player2Score === totalCorrectIngredients) {
+                        message = player1Score > player2Score ? 'Player 1 wins!' : 'Player 2 wins!';
+                    }
+
+                    // Vérification si le chrono est terminé
+                    if (timeLeft <= 0) {
+                        if (player1Score > player2Score) {
+                            message = 'Player 1 wins with a higher score!';
+                        } else if (player2Score > player1Score) {
+                            message = 'Player 2 wins with a higher score!';
+                        } else {
+                            message = 'It\'s a tie!';
+                        }
+                    }
+
+                    if (message) {
+                        ioServer.to(roomId).emit('endGame', message);
                     }
                 }
 
-                ioServer.to(roomId).emit('endGame',message);
+                    socket.on('playerQuit', ({ roomId, player }) => {
+                        // Informer l'autre joueur dans la salle que quelqu'un a quitté
+                        socket.to(roomId).emit('playerLeft', { player: player, message: `${player} a quitté la partie.` });
+
+                        // Déconnecter le joueur
+                        socket.leave(roomId);
+                        console.log(`${player} a quitté la salle ${roomId}`);
+                    });
+
+
+               // waitingRoom = null; // Réinitialiser waitingRoom après utilisation
+
+
+        // Gestion de la déconnexion
+        socket.on("disconnect", () => {
+            console.log("A user disconnected");
+            // Si l'utilisateur était dans une room d'attente, cette room est maintenant supprimée
+            if (
+                waitingRoom &&
+                (waitingRoom.players[0].username === socket.username ||
+                    waitingRoom.players[1].username=== socket.username)
+            ) {
+                waitingRoom = null;
             }
-
-
-            function endGame(roomId) {
-
-                let message;
-                const player1Score = playerScores.player1 || 0;
-                const player2Score = playerScores.player2 || 0;
-
-                if (player1Score > player2Score) {
-                    message='Player 1 wins with more points!';
-                } else if (player2Score > player1Score) {
-                    message ='Player 2 wins with more points!';
-                } else {
-                    message='It\'s a tie!';
-                }
-
-                ioServer.to(roomId).emit('endGame',message);
-            }
-
-        }
-
-
-
-        else {
-            console.error('Aucune room trouvée pour démarrer le jeu.');
-        }
-
+        });
     }
-
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-        // Si l'utilisateur était dans une room d'attente, cette room est maintenant supprimée
-        if (waitingRoom && (waitingRoom.player1 === socket.username || waitingRoom.player2 === socket.username)) {
-            waitingRoom = null;
-        }
-    });
-
-
 });
-
-
-//
-// let waitingRoom = null; // Variable pour stocker la room d'attente
-// let playerScores = {}; // Object pour stocker les scores des joueurs
-//
-// ioServer.on('connection', (socket) => {
-//     console.log('A player connected:', socket.id);
-//
-//     const existingRoom = Object.keys(socket.rooms).find(roomId => roomId.startsWith('room-'));
-//
-//     if (waitingRoom) {
-//         // Si une room d'attente existe, ajoute le joueur à cette room
-//         socket.join(waitingRoom.roomId);
-//         waitingRoom.player2 = socket.username;
-//         console.log(`User ${socket.username} joined room ${waitingRoom.roomId}`);
-//
-//         // Émettre un événement pour indiquer que la room est prête
-//         ioServer.to(waitingRoom.roomId).emit('roomReady', {
-//             roomID: waitingRoom.roomId,
-//             player1: waitingRoom.player1,
-//             player2: waitingRoom.player2
-//         });
-//
-//         // Initialiser les scores des joueurs
-//         playerScores[waitingRoom.player1] = 0;
-//         playerScores[waitingRoom.player2] = 0;
-//
-//         // Démarrer le jeu
-//         startGame(waitingRoom.roomId);
-//         waitingRoom = null; // Réinitialiser la room d'attente
-//     } else if (!existingRoom) {
-//         // Si aucune room n'existe, crée une nouvelle room
-//         const newRoomId = 'room-' + Math.random().toString(36).substr(2, 9);
-//         socket.join(newRoomId);
-//         console.log(`Room ${newRoomId} created for user ${socket.username}`);
-//
-//         // Stocke la nouvelle room d'attente
-//         waitingRoom = { roomId: newRoomId, player1: socket.username };
-//         ioServer.to(newRoomId).emit('roomCreated', { roomID: newRoomId, player1: socket.username });
-//     }
-// });
-//
-// // Fonction pour démarrer le jeu
-// function startGame(roomId) {
-//     const randomRecipe = getRandomRecipe(); // Générez une recette aléatoire
-//     const correctIngredients = randomRecipe.ingredients; // Obtenez les ingrédients corrects
-//
-//     // Diffusez les données de la recette à tous les joueurs dans la room
-//     ioServer.to(roomId).emit('gameData', {
-//         recipe: randomRecipe.name,
-//         ingredients: randomRecipe.ingredients,
-//         allIngredients: ingredients
-//     });
-//
-//     // Démarrez le chronomètre
-//     startTimer(roomId, correctIngredients);
-// }
-//
-// // Fonction pour démarrer le timer
-// function startTimer(currentRoom, correctIngredients) {
-//     let timeLeft = 30;
-//     const timerInterval = setInterval(() => {
-//         timeLeft--;
-//         ioServer.to(currentRoom).emit('updateTimer', timeLeft);
-//         if (timeLeft <= 0) {
-//             clearInterval(timerInterval);
-//             endGame(currentRoom);
-//         }
-//     }, 1000);
-//
-//     // Gestion de la sélection d'ingrédients
-//     socket.on('selectIngredient', ({ ingredient }) => {
-//         console.log(`Le joueur ${socket.username} a sélectionné ${ingredient}`);
-//         if (correctIngredients.includes(ingredient)) {
-//             // Mettre à jour le score du joueur
-//             playerScores[socket.username] = (playerScores[socket.username] || 0) + 1; // Incrémente le score
-//
-//             // Émettre les mises à jour aux autres joueurs
-//             ioServer.to(currentRoom).emit('disableIngredient', ingredient);
-//             ioServer.to(currentRoom).emit('updateScores', playerScores);
-//
-//             // Vérifier si quelqu'un a gagné
-//             checkWinCondition(currentRoom, correctIngredients.length);
-//         } else {
-//             console.log(`${ingredient} n'est pas un ingrédient correct.`);
-//         }
-//     });
-// }
-//
-// // Vérification de la condition de victoire
-// function checkWinCondition(roomId, totalCorrectIngredients) {
-//     const player1Score = playerScores[waitingRoom.player1] || 0;
-//     const player2Score = playerScores[waitingRoom.player2] || 0;
-//
-//     // Vérifier si un des joueurs a trouvé tous les ingrédients corrects
-//     if (player1Score >= totalCorrectIngredients) {
-//         ioServer.to(roomId).emit('endGame', 'Player 1 wins!');
-//     } else if (player2Score >= totalCorrectIngredients) {
-//         ioServer.to(roomId).emit('endGame', 'Player 2 wins!');
-//     }
-// }
-//
-// // Fonction pour gérer la fin de la partie
-// function endGame(roomId) {
-//     const player1Score = playerScores[waitingRoom.player1] || 0;
-//     const player2Score = playerScores[waitingRoom.player2] || 0;
-//
-//     if (player1Score > player2Score) {
-//         ioServer.to(roomId).emit('endGame', 'Player 1 wins with more points!');
-//     } else if (player2Score > player1Score) {
-//         ioServer.to(roomId).emit('endGame', 'Player 2 wins with more points!');
-//     } else {
-//         ioServer.to(roomId).emit('endGame', 'It\'s a tie!');
-//     }
-// }
-//
-// // Gestion de la déconnexion des joueurs
-// socket.on('disconnect', () => {
-//     console.log('A user disconnected');
-//     if (waitingRoom && (waitingRoom.player1 === socket.username || waitingRoom.player2 === socket.username)) {
-//         waitingRoom = null; // Réinitialiser la room d'attente si un joueur se déconnecte
-//     }
-// });
-
 
 
 
