@@ -394,7 +394,7 @@ const ioServer = new Server(httpServer, {
 });
 
 // Définissez les ingrédients ici pour qu'ils soient accessibles globalement
-const ingredients = ["Farine", "Sucre", "Beurre", "Œufs", "Lait", "Levure chimique", "Chocolat noir", "Crème fraîche", "Vanille", "Fraises", "Citron", "Amandes", "Noix de coco", "Crème au beurre", "Poudre d'amandes", "Mascarpone", "Café fort", "Cacao en poudre,Chocolat blanc", "Fromage", "Courgette"];
+const ingredients = ["Farine", "Sucre", "Beurre", "Œufs", "Lait", "Levure chimique", "Chocolat noir", "Crème fraîche", "Vanille", "Fraises", "Citron", "Amandes", "Noix de coco", "Crème au beurre", "Poudre d'amandes", "Mascarpone", "Café fort", "Cacao en poudre", "Fromage", "Courgette"];
 
 // Ajoutez les recettes ici comme avant
 const recipes = [{
@@ -419,8 +419,7 @@ function getRandomRecipe() {
 let waitingRoom = null; // Variable globale pour la room d'attente
 let playerScores = {}; // Initialisation des scores des joueurs
 let connectedUsers = []; // Liste des utilisateurs connectés
-
-
+let correctIngredients = [];
 ioServer.on('connection', (socket) => {
     console.log('Un client est connecté');
     let newRoomId;
@@ -447,14 +446,8 @@ ioServer.on('connection', (socket) => {
 
         ioServer.emit('usersUpdated', connectedUsers);
 
-
-        let correctIngredients = [];
-        // Gestion des joueurs qui démarrent une partie
-
-// Fonction pour démarrer le timer
-
             if (!waitingRoom) {
-                // Si c'est le premier joueur, créer une nouvelle room
+
                 newRoomId = 'room-' + Math.random().toString(36).substr(2, 9);
 
                 socket.join(newRoomId);
@@ -471,12 +464,10 @@ ioServer.on('connection', (socket) => {
                 // Récupérer une recette aléatoire pour la partie
                 let randomRecipe = getRandomRecipe();
                 correctIngredients = randomRecipe.ingredients;
+                console.log("correct ingred dans le else room ready" , correctIngredients)
                 socket.join(waitingRoom.roomId);
 
-
-
                 console.log("waitingRoom.roomId",waitingRoom.roomId)
-
                 waitingRoom.players.push({ username: socket.username, actif: true,
                     });
                 waitingRoom.players.forEach(player => {
@@ -492,110 +483,80 @@ ioServer.on('connection', (socket) => {
                     allIngredients: ingredients
                 });
             }
+
                 socket.on('startGame', () => {
 
                     console.log("waitingRoom jj",waitingRoom)
-                startTimer(waitingRoom.roomId);
+                    startTimer(waitingRoom.roomId);
 
+                    function startTimer(roomId) {
+                        let timeLeft = 40;
+
+                        const timerInterval = setInterval(() => {
+                            timeLeft--;
+                            ioServer.to(roomId).emit('updateTimer', timeLeft);
+
+                            checkWinCondition(waitingRoom.roomId, correctIngredients.length, timeLeft, timerInterval);
+
+                        }, 1000); // Répéter chaque seconde
+                    }
 
                 });
-                function startTimer(roomId) {
-                    let timeLeft = 40;
 
-                    const timerInterval = setInterval(() => {
-                        timeLeft--;
-                        ioServer.to(roomId).emit('updateTimer', timeLeft);
-                        checkWinCondition(roomId, correctIngredients.length, timeLeft);
-
-                        if (timeLeft <= 0) {
-                            clearInterval(timerInterval); // Arrêter le timer
-                            endGame(roomId);
-                        }
-                    }, 1000); // Répéter chaque seconde
-                }
 
                     function getPlayer(username) {
                         return waitingRoom.players.find(player => player.username === username);
                     }
 
                     socket.on('selectIngredient', ({ingredient}) => {
+                         let message;
+                         let player = getPlayer(socket.username);
+                          if (!player) { console.log(`Player with username ${socket.username} not found`);}
 
-
-                    let message;
-                    let player = getPlayer(socket.username);
-                    if (!player) { console.log(`Player with username ${socket.username} not found`);}
                     console.log('playeeer dans select ',player);
                    // const playerScore = getPlayerScore(player)
                     console.log()
+
                     if (correctIngredients.includes(ingredient)) {
 
                         player.score++;  // Incrémenter le score du joueur qui a cliqué
 
                         console.log("player",player.score);
+                        console.log('je suis dans selctingredient',waitingRoom.players)
 
                         message = 'Bien joué :) !';
-                        ioServer.to(waitingRoom.roomId).emit('disableIngredient', ingredient); // Désactiver l'ingrédient pour les deux joueurs
-                        ioServer.to(waitingRoom.roomId).emit('updateScores',waitingRoom.players); // Mettre à jour les scores
-                        checkWinCondition(waitingRoom.roomId, correctIngredients.length);
-
-
+                        ioServer.to(waitingRoom.roomId).emit('disableIngredient', ingredient);
+                        ioServer.to(waitingRoom.roomId).emit('updateScores',waitingRoom.players);
+                       // checkWinCondition(waitingRoom.roomId, correctIngredients.length);
                     } else {
                         message = 'Essaie encore :( !!';
                     }
 
-                    // Envoyer un message de retour au joueur
                     ioServer.to(waitingRoom.roomId).emit('updateMessage', {message, player});
                 });
 
 
+                function checkWinCondition(roomId, totalCorrectIngredients,timeLeft, timerInterval) {
+                    const player1Score = waitingRoom.players[0].score;
+                    const player2Score = waitingRoom.players[1].score;
 
-                    function endGame(roomId) {
 
-                    let message;
-                        const player1 = waitingRoom.players[0];
-                        const player2 = waitingRoom.players[1];
-
-                        const player1Score = getPlayer(player1) || 0;
-                        const player2Score = getPlayer(player2)|| 0;
-
-                    if (player1Score > player2Score) {
-                        message = 'Player 1 wins with more points!';
-                    } else if (player2Score > player1Score) {
-                        message = 'Player 2 wins with more points!';
-                    } else {
-                        message = 'It\'s a tie!';
-                    }
-
-                    // Envoyer le message de fin de partie
-                    ioServer.to(roomId).emit('endGame', message);
-                    }
-
-                function checkWinCondition(roomId, totalCorrectIngredients, timeLeft) {
-                    const player1 = waitingRoom.players[0];
-                    const player2 = waitingRoom.players[1];
-
-                    const player1Score = getPlayer(player1) || 0;
-                    const player2Score = getPlayer(player2)|| 0;
-
+                    console.log('plyerscoor1',player1Score);
+                    console.log('plyerscoor1',player2Score);
+                    console.log("totalingrediant",totalCorrectIngredients);
                     let message = null;
 
                     // Vérification si un joueur a trouvé tous les ingrédients corrects
-                    if (player1Score === totalCorrectIngredients || player2Score === totalCorrectIngredients) {
-                        message = player1Score > player2Score ? 'Player 1 wins!' : 'Player 2 wins!';
-                    }
+                    if (timeLeft <=0 || player1Score === totalCorrectIngredients || player2Score === totalCorrectIngredients) {
 
-                    // Vérification si le chrono est terminé
-                    if (timeLeft <= 0) {
-                        if (player1Score > player2Score) {
-                            message = 'Player 1 wins with a higher score!';
-                        } else if (player2Score > player1Score) {
-                            message = 'Player 2 wins with a higher score!';
-                        } else {
-                            message = 'It\'s a tie!';
-                        }
+                        message = player1Score > player2Score ? 'Player 1 wins!' : 'Player 2 wins!';
+                         clearInterval(timerInterval);
                     }
+                    // else {message = 'It\'s a tie!';}
+
 
                     if (message) {
+                        console.log("mesaage endgame")
                         ioServer.to(roomId).emit('endGame', message);
                     }
                 }

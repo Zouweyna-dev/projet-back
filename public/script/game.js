@@ -59,13 +59,14 @@ window.socket.on('roomReady', function (data) {
     updatePlayerNames(player1, player2);
     initIngredient(data);
     initGame();
+    window.socket.emit('startGame');
 });
 function updatePlayerNames(player1, player2) {
     document.getElementById('player1Name').textContent = player1;
     document.getElementById('player2Name').textContent = player2;
 }
 let roomId = localStorage.getItem('roomId');
-window.socket.emit('startGame');
+
 function initIngredient(data){
 
     document.getElementById('recipe').textContent =
@@ -88,7 +89,7 @@ function createIngredientButton(ingredient) {
     const button = document.createElement('button');
     button.className = 'ingredient';
     button.onclick = () => {
-        console.log("username dans select ",username2);
+
         window.socket.emit('selectIngredient', { ingredient });
     };
     button.textContent = ingredient;
@@ -101,7 +102,6 @@ window.socket.on('updateTimer', (timeLeft) => {
 // Désactivez l'ingrédient sélectionné
 window.socket.on('disableIngredient', (ingredient) => {
     const buttons = document.querySelectorAll('.ingredient');
-
     console.log(`Désactivation de l'ingrédient: ${ingredient}`);
     buttons.forEach(button => {
         if (button.textContent === ingredient) {
@@ -164,6 +164,8 @@ window.socket.on('updateScores', function(players) {
 });
 
     window.socket.on('updateMessage',({message, player}) => {
+
+        console.log("je suis dans updatemessage",player)
         if(player === player1) {
             document.getElementById('player1status').textContent = message;
         } else if(player === player2){
@@ -190,7 +192,7 @@ socket.on('playerLeft', ({ player, message }) => {
 });
 
 window.socket.on('endGame', (message) => {
-    //alert(message);
+    alert(message);
     //initGame(); // Réinitialiser le jeu pour un nouveau tour
 });
 
