@@ -62,7 +62,7 @@ async function insertGameScore(playerId, gameId, score) {
 }
 
 
-app.get("/index", (re, res) => {
+app.get("/", (re, res) => {
     return res.render("index");
 });
 
