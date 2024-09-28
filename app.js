@@ -24,8 +24,10 @@ const client = new MongoClient(uri);
 
 const app = express();
 
-const jwtSecret = crypto.randomBytes(64).toString('hex');
-console.log(jwtSecret);
+const jwtRandomSecret = crypto.randomBytes(64).toString('hex');
+console.log( 'jwt = ',jwtRandomSecret);
+
+const jwtSecret = process.env.JWT_SECRET;
 
 app.set('view engine', 'pug');
 app.use(cookieParser());
