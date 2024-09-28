@@ -4,9 +4,9 @@ import {connectSocket} from "./socketUtils.js";
 console.log('game.js is loaded');
 const token = window.localStorage.getItem('token');
 let player1;
+
 let player2;
 let correctIngredients;
-let timerInterval;
 let timerStarted = false;
 let timeLeft ;
 let username;
@@ -124,6 +124,7 @@ function shuffleArray(array) {
 
 function initGame() {
     resetTimer();
+   //desactiv" le jeu quand un joueur quite
     //enableStartTimerButton();
 }
 
@@ -133,7 +134,8 @@ console.log("nooon")
 function resetTimer() {
     timerStarted = false;
     timeLeft=40;
-    updateTimerDisplay();
+
+    updateTimerDisplay()
 }
 
 // Activer le bouton de démarrage du chronomètre
@@ -142,10 +144,6 @@ function resetTimer() {
 //     startButton.textContent = 'Lancer le chronomètre';
 // }
 
-
-
-
-// Mettez à jour les scores des joueurs
 window.socket.on('updateScores', function(players) {
 
     players.forEach((player, index) => {
@@ -179,57 +177,23 @@ function updateTimerDisplay() {
     }
 
 const quitButton = document.getElementById('quitButton');
-quitButton.addEventListener('click', () => {
-    // Émettre un événement au serveur pour informer de la déconnexion
-    window.socket.emit('playerQuit',roomId);
-
-    console.log("playerQuit");
+quitButton.addEventListener('click', function() {
+    const token = localStorage.getItem('token'); // or wherever you store your token
+    window.socket.emit('playerQuit', token);
 });
- window.socket.on('playerLeft', ({ player, message }) => {
+
+window.socket.on('playerLeft', ({ player, message }) => {
     // Afficher un message à l'autre joueur
     alert(message);
     // Optionnel : Mettre à jour l'interface pour refléter le départ du joueur
     // Par exemple, vous pouvez désactiver les boutons ou rediriger l'utilisateur
+    initGame()
 });
-
 window.socket.on('endGame', (message) => {
     alert(message);
     //initGame(); // Réinitialiser le jeu pour un nouveau tour
 });
 
-
-   // document.getElementById('player1status').textContent = `Dommage, "${ingredient}" n'est pas un ingrédient de cette recette.`;
-    //document.getElementById('player2status').textContent = `Bien joué ! "${ingredient}" est un bon ingrédient.`;
-
-
-
-// window.socket.on('disableIngredient', (ingredient) => {
-//     const ingredientElement = document.getElementById(ingredient);
-//     if (ingredientElement) {
-//         ingredientElement.disabled = true;
-//         // Désactive l'ingrédient dans l'UI
-//         console.log(`L'ingrédient ${ingredient} a été désactivé.`);
-//     }
-// });
-
-// Mettez à jour l'affichage des scores
-
-
-
-// function startTimer() {
-//     if (timerStarted) return;
-//
-//     timerStarted = true;
-//     startButton.disabled = true; // Désactivez le bouton une fois cliqué
-//     timerInterval = setInterval(() => {
-//         timeLeft--;
-//         updateTimerDisplay();
-//         if (timeLeft <= 0) {
-//             clearInterval(timerInterval);
-//             window.socket.emit('endGame');
-//         }
-//     }, 1000);
-// }
 
 
 

@@ -483,7 +483,7 @@ ioServer.on('connection', (socket) => {
                     allIngredients: ingredients
                 });
             }
-
+        let timerInterval;
                 socket.on('startGame', () => {
 
                     console.log("waitingRoom jj",waitingRoom)
@@ -492,10 +492,9 @@ ioServer.on('connection', (socket) => {
                     function startTimer(roomId) {
                         let timeLeft = 40;
 
-                        const timerInterval = setInterval(() => {
+                         timerInterval = setInterval(() => {
                             timeLeft--;
                             ioServer.to(roomId).emit('updateTimer', timeLeft);
-
                             checkWinCondition(waitingRoom.roomId, correctIngredients.length, timeLeft, timerInterval);
 
                         }, 1000); // Répéter chaque seconde
@@ -520,10 +519,8 @@ ioServer.on('connection', (socket) => {
                     if (correctIngredients.includes(ingredient)) {
 
                         player.score++;  // Incrémenter le score du joueur qui a cliqué
-
                         console.log("player",player.score);
                         console.log('je suis dans selctingredient',waitingRoom.players)
-
                         message = 'Bien joué :) !';
                         ioServer.to(waitingRoom.roomId).emit('disableIngredient', ingredient);
                         ioServer.to(waitingRoom.roomId).emit('updateScores',waitingRoom.players);
@@ -531,20 +528,17 @@ ioServer.on('connection', (socket) => {
                     } else {
                         message = 'Essaie encore :( !!';
                     }
-
                     ioServer.to(waitingRoom.roomId).emit('updateMessage', message,player);
 
                 });
-
 
                 function checkWinCondition(roomId, totalCorrectIngredients,timeLeft, timerInterval) {
                     const player1Score = waitingRoom.players[0].score;
                     const player2Score = waitingRoom.players[1].score;
 
-
-                    console.log('plyerscoor1',player1Score);
-                    console.log('plyerscoor1',player2Score);
-                    console.log("totalingrediant",totalCorrectIngredients);
+                    // console.log('plyerscoor1',player1Score);
+                    // console.log('plyerscoor1',player2Score);
+                    // console.log("totalingrediant",totalCorrectIngredients);
                     let message = null;
 
                     // Vérification si un joueur a trouvé tous les ingrédients corrects
@@ -562,17 +556,25 @@ ioServer.on('connection', (socket) => {
                     }
                 }
 
-                    socket.on('playerQuit', (roomId) => {
-                        // Informer l'autre joueur dans la salle que quelqu'un a quitté
-                        socket.to(roomId).emit('playerLeft',
-                            { player: socket.username, message: `${socket.username} a quitté la partie.` });
-console.log("player quit",socket.username )                        // Déconnecter le joueur
-                        socket.leave(roomId);
-                        //console.log(`${player} a quitté la salle ${roomId}`);
-                    });
+        socket.on('playerQuit', function(token) {
+            let decodedToken;
+            try {
+                decodedToken = jwt.verify(token, jwtSecret);
+                const userId = decodedToken.userId;
+                console.log('Token décodé:', decodedToken);
+            } catch (error) {
+                console.error('Erreur de décodage du token:', error);
+                return;
+            }
 
-
-               // waitingRoom = null; // Réinitialiser waitingRoom après utilisation
+            socket.to(waitingRoom.roomId).emit('playerLeft', { player: decodedToken.userName, message: `${decodedToken.userName} a quitté la partie.` });
+            console.log("player quit",socket.username );
+            console.log('Token décodé username:', decodedToken.userName);
+            socket.leave(waitingRoom.roomId);
+            console.log("timerInterval",timerInterval)
+            clearInterval(timerInterval);
+            waitingRoom = null;//a verifier
+        });
 
 
         // Gestion de la déconnexion

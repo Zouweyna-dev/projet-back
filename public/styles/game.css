@@ -16,13 +16,14 @@
     /*font-family: 'Bangers', cursive;*/
     font-family: 'Comic Neue', cursive;
     color: var(--primary-color);
-    background-color: #ffcccb;
+    /*background-color: #ffcccb;*/
+    background-color: #e6e6fa;
     border-radius: 15px;
     padding: 2rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 1000px;
-    width: 95%;
+    max-width: 90%;
+    width: 60%;
     margin: 3rem auto;
 }
 h1 {
@@ -52,13 +53,15 @@ h1 {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
-    margin-top: 0.6rem;
+    /*margin-top: 0.6rem;*/
 }
 
 .ingredient {
     font-weight: bold;
     font-family: 'Comic Neue', cursive;
-    background-color: #f0e6d2;
+    /*//background-color: #f0e6d2;*/
+   /*//background-color:  #FCE883;*/
+    background-color: mediumslateblue;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
@@ -90,10 +93,11 @@ h1 {
     font-size: 1.1rem;
     color: #333;
     margin-top: 1rem;
+    border:0;
 }
 .recipe {
     font-size: 1.2rem;
-    color: #5e2f0d;
+    color: #653f59;
     margin: 0.5rem 0;
     padding: 1rem;
     background-color: #fdf6e3;
@@ -103,19 +107,19 @@ h1 {
 
 .status {
     font-size: 1rem;
-    color: #3f51b5;
+    color: #8052b2;
     margin-top: 1rem;
 }
 
 h2 {
-    color: #5e2f0d;
+    color: #47108d;
     font-size: 1.5rem;
 }
 
 .score {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #4caf50;
+    color: #4d415b;
     margin-top: 1rem;
 
 }
