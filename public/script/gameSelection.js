@@ -1,7 +1,7 @@
 //créer une session
     function createGame() {
 
-    fetch('http://localhost/api/start-game', {
+    fetch('/api/start-game', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -19,7 +19,7 @@
 function joinGame() {
     const gameSessionId = prompt("Entrez l'ID de la session de jeu :");
     if (gameSessionId) {
-        fetch(`http://localhost/api/join-game/${gameSessionId}`, {
+        fetch(`/api/join-game/${gameSessionId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ function joinGame() {
 }
 //afficher les sessions en cours
 function displayActiveGames() {
-    fetch('http://localhost/api/active-games', {
+    fetch('/api/active-games', {
         method: 'GET',
         headers: {
             'Authorization': 'Bearer ' + localStorage.getItem('token')

@@ -18,9 +18,9 @@ let db;
 const uri=process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 const app = express();
-const jwtRandomSecret = crypto.randomBytes(64).toString('hex');
-//console.log( 'jwt = ',jwtRandomSecret);
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = crypto.randomBytes(64).toString('hex');
+//console.log( 'jwt = ',jwtSecret);
+
 
 app.set('view engine', 'pug');
 app.use(cookieParser());
@@ -228,10 +228,9 @@ const httpServer = app.listen(80, () => {
 
 /** Partie Socket.io back-end */
 
-
 const ioServer = new Server(httpServer, {
     cors: {
-        origin: "http://localhost", methods: ["GET", "POST"]
+        origin: "*", methods: ["GET", "POST"]
     }
 });
 

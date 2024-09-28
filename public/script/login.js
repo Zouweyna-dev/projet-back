@@ -9,7 +9,7 @@ if (myForm && notificationMessage) {
         const data = Object.fromEntries(formData);
 
         try {
-            const result = await fetch('http://localhost/login', {
+            const result = await fetch('/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
