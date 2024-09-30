@@ -4,7 +4,7 @@
     --primary-color: #4A4E69;
     --secondary-color: #9A8C98;
     --tertiary-color: #C9ADA7;
-    --accent-color: #F2E9E4;
+    --accent-color: #d0b6a8;
     --text-color: #22223B;
     --background-color: #FFFFFF;
 }
@@ -83,7 +83,7 @@
     font-size: 1rem;
     padding: 0.75rem;
     border-radius: 12px;
-    background-color: #72677e;
+    background-color: var(--accent-color);
     color: white;
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -126,7 +126,7 @@
 
 .recipe {
     font-style: italic;
-    color: #6c757d;
+    color: var(--text-color);
 }
 
 .player-list-card {
@@ -205,8 +205,8 @@
 }
 
 .ingredient img {
-    max-width: 70px;
-    max-height: 70px;
+    max-width: 100%;
+    max-height: 100%;
     margin-bottom: 5px;
 }
 

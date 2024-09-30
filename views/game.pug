@@ -10,6 +10,8 @@ block content
     .container-fluid.py-4
         .row.justify-content-center
             .col-lg-10
+                #messageContainer.text-center.mb-3
+
                 .card.shadow.game-card
                     .card-body
                         h2.card-title.text-center.mb-4 Défi Pâtisserie : La Course aux Desserts
@@ -41,8 +43,8 @@ block content
                         #player-grid.ingredient-grid.row.row-cols-4.row-cols-md-4.g-2.mb-4.row.mt-4
 
                         .d-flex.flex-column.align-items-end.mt-4
-                            button#quitButton.btn.btn-danger Quitter la session
-                            button#resetButton.btn.btn-primary Recette suivante
+                            button#quitButton.btn.btn-danger Quitter la partie
+                            button#resetButton.btn.btn-primary Démarrer la partie
                             a(href='/leaderBoard', class='btn btn-info')
                                 i(class='bi bi-trophy') Voir le tableau de classement
 
