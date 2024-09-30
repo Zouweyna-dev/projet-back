@@ -1,9 +1,12 @@
 nav.navbar
     link(rel='stylesheet', href='/styles/header.css')
     a.logo(href='#')
-        span 🍭 La Folie des Desserts
+        span 🍭 Le Chasseur de Délices
     .nav-links
-        a.nav-link(href='/index') Accueil
+        a.nav-link(href='/') Accueil
         a.nav-link(href='/game') Jouer
         a.nav-link(href='/login') Connexion
         a.nav-link(href='/subscribe') Inscription
+        a.nav-link(href='/', id='logout-link') Déconnexion
+
+    script(type="module", src='/script/logout.js')

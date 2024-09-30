@@ -5,6 +5,7 @@ console.log("tesssst");
 if (myForm && notificationMessage) {
     myForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+        const token = window.localStorage.getItem('token');
         const formData = new FormData(myForm);
         const data = Object.fromEntries(formData);
 
@@ -19,8 +20,22 @@ if (myForm && notificationMessage) {
 
             if (!result.ok) {
                 console.log(`Erreur HTTP! statut : ${result.status}`);
-                const text = await result.text();
-                console.log('Réponse du serveur en texte brut :', text);
+                try {
+                    const errorData = await result.json(); // Parse directement en JSON
+                    console.log('Réponse du serveur en JSON :', errorData);
+                    notificationMessage.textContent = errorData.message;
+                    notificationMessage.style.color = 'red';
+                } catch (err) {
+                    // Si la réponse n'est pas au format JSON
+                    const text = await result.text();
+                    console.log('Réponse du serveur en texte brut :', text);
+                    notificationMessage.textContent = "Erreur inconnue";
+                }
+
+                if (result.status === 403){
+
+                    window.location.href = '/403';
+                }
             } else {
                 const responseBody = await result.json();
                 const token = responseBody.token;
@@ -30,12 +45,11 @@ if (myForm && notificationMessage) {
                 console.log('Token:', token);
 
                 if (token) {
-                    // Stocker le token dans localStorage
+
                     window.localStorage.setItem('token', token);
                     window.localStorage.setItem('userName', userName);
-                        // Redirection vers la page de jeu si tout est correct
-                        window.location.href = '/game'; // Redirection vers la page de jeu
-                    }
+                    window.location.href = '/game';
+                }
                 else {
                     console.log('Error: No valid response received from the server');
                 }

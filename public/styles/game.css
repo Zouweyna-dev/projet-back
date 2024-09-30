@@ -1,194 +1,274 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap');
-
-/*body {*/
-/*    font-family: 'Roboto', sans-serif;*/
-/*    background-color: #f9f1e7;*/
-/*    margin: 0;*/
-/*    padding: 0;*/
-/*    display: flex;*/
-/*    justify-content: center;*/
-/*    align-items: center;*/
-/*    min-height: 100vh;*/
-/*}*/
-
-.game-container {
-    /*font-family: 'Bangers', cursive;*/
-    font-family: 'Comic Neue', cursive;
-    color: var(--primary-color);
-    /*background-color: #ffcccb;*/
-    background-color: #e6e6fa;
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    max-width: 90%;
-    width: 60%;
-    margin: 3rem auto;
+:root {
+    --primary-color: #4A4E69;
+    --secondary-color: #9A8C98;
+    --tertiary-color: #C9ADA7;
+    --accent-color: #F2E9E4;
+    --text-color: #22223B;
+    --background-color: #FFFFFF;
 }
-h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
+.game-card {
+    border-radius: 20px;
 
-.game-area {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 1rem;
-}
-
-.player-area {
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    margin: 2rem;
-    flex: 1;
+    font-family: 'Comic Neue', cursive;
+}
+.cta-button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+.player-info {
+    background-color: #f1f3f5;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+}
+@media (max-width: 768px) {
+    .features {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+.card.player-card.winner {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+#winnerMessage {
+    font-size: 1.5rem;
+    color: #28a745;
+    font-weight: bold;
+}
 
+.player-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+}
+
+.player-info .score {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.player-info .status {
+    font-size: 0.8rem;
 }
 
 
 .ingredient-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1rem;
-    /*margin-top: 0.6rem;*/
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
 }
 
-.ingredient {
-    font-weight: bold;
-    font-family: 'Comic Neue', cursive;
-    /*//background-color: #f0e6d2;*/
-   /*//background-color:  #FCE883;*/
-    background-color: mediumslateblue;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin: 0.5rem;
-    width: 60%;
-    padding:0.7rem;
-    word-wrap: break-word;
-
+@media (min-width: 768px) {
+    .ingredient-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
-
-.ingredient:hover {
-    background-color: #e6d8b7;
-}
-
-.ingredient:disabled {
-    opacity: 0.5;
+.ingredient-grid button:disabled {
+    background-color: #ccc;
+    color: #666;
     cursor: not-allowed;
+    opacity: 0.6;
+}
+
+
+.ingredient-grid button {
+    font-size: 1rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background-color: #72677e;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    min-width: 150px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    white-space: normal;
+    line-height: 1.4;
+    margin: 0 10px;
+}
+
+.ingredient-grid button:hover {
+    accent-color: #F2E9E4;
+    transform: translateY(-2px);
+}
+
+
+.ingredient-grid button:hover {
+    background-color: #ced4da;
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ingredient-grid button:active {
+    transform: scale(0.95);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .timer {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #8b4513;
-    margin: 0.5rem 0;
-}
-.feedback {
-    font-size: 1.1rem;
-    color: #333;
-    margin-top: 1rem;
-    border:0;
-}
-.recipe {
     font-size: 1.2rem;
-    color: #653f59;
-    margin: 0.5rem 0;
-    padding: 1rem;
-    background-color: #fdf6e3;
-    border-radius: 8px;
-
 }
 
-.status {
-    font-size: 1rem;
-    color: #8052b2;
-    margin-top: 1rem;
+#timer {
+    color: #dc3545;
 }
 
-h2 {
-    color: #47108d;
-    font-size: 1.5rem;
+.recipe {
+    font-style: italic;
+    color: #6c757d;
 }
 
-.score {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #4d415b;
-    margin-top: 1rem;
-
-}
-
-ul#playerList {
-    list-style-type: none;
-    padding: 0;
-    margin: 20px 0;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-height: 300px;
+.player-list-card {
+    border-radius: 15px;
+    max-height: 80vh;
     overflow-y: auto;
 }
 
-ul#playerList li {
-    padding: 10px;
-    font-size: 1.1rem;
-    color: #333;
-    border-bottom: 1px solid #eee;
-}
-ul#playerList li:last-child {
-    border-bottom: none;
+#playerList {
+    list-style-type: none;
+    border-top: none;
 }
 
-/* Optionnel : style pour le survol des éléments de la liste */
-ul#playerList li:hover {
-    background-color: #f0f0f0;
+#playerList .list-group-item {
+    background-color: transparent;
+    border-left: none;
+    border-right: none;
+}
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    text-transform: uppercase;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-
-.ingredient-button {
-    /* Réduire la taille du bouton */
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-}
-.button {
-    background-color: #5c9ead;
+#quitButton {
+    background-color: var( --primary-color);
     color: white;
     border: none;
-    padding: 0.7rem 1rem;
-    font-size: 1rem;
+}
+
+#quitButton:hover {
+    background-color: var( --primary-color);
+    transform: scale(1.05);
+}
+
+#resetButton {
+    background-color: var( --primary-color);
+    color: white;
+    border: none;
+}
+
+#resetButton:hover {
+    background-color: var(  --secondary-color);
+    transform: scale(1.05);
+}
+
+.btn-info {
+    background-color:var(  --secondary-color);
+    color: white;
+    border: none;
+}
+
+.btn-info:hover {
+    background-color: var(  --secondary-color);;
+    transform: scale(1.05);
+}
+
+
+.ingredient {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
     border-radius: 5px;
+    padding: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin: 0.5rem;
+    transition: background-color 0.3s;
+    width: 70px;
 }
 
-.button:hover {
-    background-color: #4a7c8a;
+.ingredient:hover {
+    background-color: #e0e0e0;
 }
 
-.feedback {
-    font-size: 1.1rem;
-    color: #333;
-    margin-top: 1rem;
+.ingredient img {
+    max-width: 70px;
+    max-height: 70px;
+    margin-bottom: 5px;
 }
 
-/*.timer {*/
-/*    font-size: 1.5rem;*/
-/*    color: #5c9ead;*/
-/*    margin-bottom: 1rem;*/
+.player-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 200px;
+    min-height: 250px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.player-card img.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+h2.card-title {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.score, .status {
+    text-align: center;
+    font-size: 1rem;
+}
+
+/*.card-body {*/
+/*    padding: 10px;*/
+/*    text-align: center;*/
 /*}*/
-
-#startTimerButton {
-    background-color: #ff6b6b;
+.card-small {
+    height: 150px;
 }
 
-#startTimerButton:hover {
-    background-color: #ff4757;
+.card-body {
+    padding: 0.5rem;
 }
 
+.d-flex {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.btn {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+a.btn-info {
+    display: flex;
+    align-items: center;
+}
+
+a.btn-info i {
+    margin-right: 5px;
+}

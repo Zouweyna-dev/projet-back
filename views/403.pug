@@ -1,0 +1,19 @@
+doctype html
+html(lang="fr")
+    head
+        title Accès Interdit
+        link(rel="stylesheet" href="/styles/403.css")
+    body
+        header
+            h1 Accès Interdit
+        main
+            section
+                h2 Vous êtes déjà connecté
+                p Vous essayez de vous connecter à nouveau. Veuillez retourner à la page de jeu ou vous déconnecter.
+                a(href="/game") Aller à la page de jeu
+                | ou
+                a(href="/", id='logout-link') Se déconnecter
+        footer
+            p &copy; 2024 Votre Jeu
+
+    script(type="module", src='/script/logout.js')

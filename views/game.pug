@@ -1,30 +1,57 @@
 extends layouts/layout.pug
 
 block content
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css')
     link(rel='stylesheet', href='/styles/game.css')
     script(src='https://cdn.socket.io/4.0.0/socket.io.min.js')
-    title D&eacute;fi P&acirc;tisserie : La Course aux Desserts
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js')
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css')
 
-    .game-container
-        h1 D&eacute;fi P&acirc;tisserie : La Course aux Desserts
-        .timer
-            | Temps restant:
-            span#timer 40
+    .container-fluid.py-4
+        .row.justify-content-center
+            .col-lg-10
+                .card.shadow.game-card
+                    .card-body
+                        h2.card-title.text-center.mb-4 Défi Pâtisserie : La Course aux Desserts
+                        .d-flex.justify-content-between.align-items-center.mb-1
+                            .timer.fs-5
+                                | Temps restant:
+                                span#timer.fw-bold 40s
+                            #recipe.recipe.fs-5 Recette:
 
-        #recipe.recipe Recette: En attente de la s&eacute;lection du chef...
-        .game-area
-            .player-area
-                h2#player1Name
-                #player1score.score Score: 0
-                #player1status.status En attente...
-            .player-area
-                h2#player2Name
-                #player2score.score Score: 0
-                #player2status.status En attente...
-        #player-grid.ingredient-grid
+                        div#winnerMessage.text-center.mb-4
+                            |
 
+                        .row.mb-2.justify-content-center
+                            .col-6
+                                .card.player-card.card-small(id='player1Card')
+                                    .card-body
+                                        img#player1Avatar.avatar
+                                        h2#player1Name.card-title
+                                        #player1score.score.fs-4 Score 0
+                                        #player1status.status.text-muted En attente...
+                            .col-6
+                                .card.player-card.card-small(id='player2Card')
+                                    .card-body
+                                        img#player2Avatar.avatar
+                                        h2#player2Name.card-title
+                                        #player2score.score.fs-4 Score 0
+                                        #player2status.status.text-muted En attente...
 
-        button#quitButton.button Quitter la session
-        div#feedback.feedback
-        ul#playerList
+                        #player-grid.ingredient-grid.row.row-cols-4.row-cols-md-4.g-2.mb-4.row.mt-4
+
+                        .d-flex.flex-column.align-items-end.mt-4
+                            button#quitButton.btn.btn-danger Quitter la session
+                            button#resetButton.btn.btn-primary Recette suivante
+                            a(href='/leaderBoard', class='btn btn-info')
+                                i(class='bi bi-trophy') Voir le tableau de classement
+
+                        #feedback.feedback.mt-3
+
+            .col-lg-2
+                .card.shadow.player-list-card
+                    .card-body
+                        h3.card-title.text-center Joueurs connectés
+                        ul#playerList.list-group.list-group-flush
+
     script(type="module", src='/script/game.js')
